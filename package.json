@@ -1,0 +1,38 @@
+{
+    "name": "rosendofun.service",
+    "version": "0.0.1",
+    "type": "commonjs",
+    "description": "rosendofun.service",
+    "main": "app/index.js",
+    "devDependencies": {
+        "@tsconfig/node20": "^20.1.4",
+        "@tsconfig/recommended": "^1.0.6",
+        "@types/koa": "^2.15.0",
+        "@typescript-eslint/eslint-plugin": "^7.6.0",
+        "@typescript-eslint/parser": "^7.6.0",
+        "eslint": "^8.57.0"
+    },
+    "scripts": {
+        "dev": "nodemon app/index.js",
+        "prod": "pm2 start ecosystem.config.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rosendolu/rosendofun.service.git"
+    },
+    "keywords": [
+        "service.rosendo.fun"
+    ],
+    "author": "rosendo",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/rosendolu/rosendofun.service/issues"
+    },
+    "homepage": "https://github.com/rosendolu/rosendofun.service#readme",
+    "dependencies": {
+        "@types/node": "^20.12.7",
+        "dayjs": "^1.11.10",
+        "koa": "^2.15.2",
+        "winston": "^3.13.0"
+    }
+}
