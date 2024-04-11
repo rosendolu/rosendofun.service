@@ -55,9 +55,9 @@ function loggerOptions(key) {
 
 const logger = getLogger('app');
 
-module.exports = logger;
 function getLogger(type = 'app') {
     return winston.loggers.get(type);
 }
 
+module.exports = logger;
 exports.getLogger = getLogger;
