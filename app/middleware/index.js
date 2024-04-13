@@ -6,37 +6,44 @@ const { isProdEnv } = require('../common/constant');
 module.exports = {
     commonHandle: function commonHandle() {
         return async function commonHandleMiddleware(ctx, next) {
+            const res = {
+                data: null,
+                error: null,
+                message: '',
+                status: 200,
+                duration: 0,
+            };
             let startTime = 0;
-            let data = null;
-            let error = null;
             try {
                 startTime = Date.now();
+                if (ctx.path === '/favicon.ico') return;
                 await next();
-                data = ctx.body;
+
+                ctx.body && (res.data = ctx.body);
             } catch (err) {
-                error = {
+                // @ts-ignore
+                res.error = {
                     // @ts-ignore
                     message: err.message || '',
                     // @ts-ignore
                     stack: err.stack || '',
                 };
-                ctx.body = error;
-                ctx.body.status = ctx.status;
                 logger.error('commonHandle Error', err);
                 //
             } finally {
-                // 线上环境防止泄漏
-                if (error && isProdEnv) {
-                    error = error.message || 'Unknown error';
+                // Remove error stack sensitive information
+                if (res.error && isProdEnv) {
+                    // @ts-ignore
+                    res.error = res.error?.message || 'Internal Server Error';
                 }
-                if (/application\/json/.test(ctx.type)) {
-                    ctx.body = {
-                        error: error,
-                        data: data || null,
-                    };
-                    // 加上时间戳
-                    ctx.body.duration = Date.now() - startTime;
-                    ctx.body.status = ctx.status;
+                // Check if the response Content-Type is JSON
+                const responseType = ctx.response.headers['content-type'];
+                if ((responseType && responseType.includes('application/json')) || !ctx.body) {
+                    // time consuming x ms
+                    res.duration = Date.now() - startTime;
+                    res.status = ctx.response.status;
+                    res.message = ctx.response.message;
+                    ctx.body = res;
                 }
             }
         };
@@ -49,7 +56,7 @@ module.exports = {
             textLimit: '100mb',
             formidable: {
                 maxFieldsSize: 100 * 1024 * 1024, // 100mb
-                uploadDir: path.resolve('./static'),
+                uploadDir: path.resolve('./temp'),
                 keepExtensions: true,
             },
         });

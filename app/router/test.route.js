@@ -1,5 +1,5 @@
 module.exports = router => {
-    router.all('/test', ctx => {
+    router.get('/test/:subpath', ctx => {
         ctx.body = {
             query: ctx.query,
             params: ctx.params,

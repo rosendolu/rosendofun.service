@@ -5,6 +5,7 @@
     "description": "rosendofun.service",
     "main": "app/index.js",
     "scripts": {
+        "preinstall": "nvm use",
         "dev": "nodemon app/index.js",
         "prod": "pm2 start ecosystem.config.js"
     },
@@ -31,6 +32,8 @@
         "glob": "^10.3.12",
         "koa": "^2.15.2",
         "koa-body": "^6.0.1",
+        "koa-session": "^6.4.0",
+        "nanoid": "^5.0.7",
         "winston": "^3.13.0"
     },
     "devDependencies": {
