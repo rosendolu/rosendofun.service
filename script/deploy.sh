@@ -1,14 +1,23 @@
 #!/bin/bash
-nvm use
+
+# Check if nvm command is available
+if command -v nvm &>/dev/null; then
+    # If nvm command is available, execute nvm use
+    nvm use
+else
+    # If nvm command is not available, print a message
+    echo "nvm is not installed or not available in the current shell environment."
+fi
+
 npm ci
 
 # Define the name of the PM2 process
 PM2_PROCESS_NAME="rosendofun.service"
 
 # Check if the PM2 process exists
-pm2 pid $PM2_PROCESS_NAME &>/dev/null
+reloadCode=pm2 list | grep -q "\<$PM2_PROCESS_NAME\>"
 
-if [ $? -eq 0 ]; then
+if [ $reloadCode -eq 0 ]; then
     # If the process exists, reload it
     echo "Reloading PM2 process: $PM2_PROCESS_NAME"
     pm2 reload $PM2_PROCESS_NAME --update-env
