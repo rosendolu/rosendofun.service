@@ -51,8 +51,9 @@ jobs:
                   #       pwd
                   #       whoami
                   #       ls -al
-                  #   SCRIPT_AFTER: |
-                  #       pwd
-                  #       whoami
-                  #       ls -al
-                  #       npm ci
+                  SCRIPT_AFTER: |
+                      bash ./script/deploy.sh
+                      #   pwd
+                      #   whoami
+                      #   ls -al
+                      #   npm ci

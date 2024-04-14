@@ -6,7 +6,6 @@
     "main": "app/index.js",
     "scripts": {
         "dev": "nodemon app/index.js",
-        "preprod": "npm ci",
         "prod": "pm2 start ecosystem.config.js"
     },
     "repository": {
