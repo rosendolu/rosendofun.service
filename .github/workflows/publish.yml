@@ -38,7 +38,7 @@ jobs:
               with:
                   node-version: 'v20.10.0'
             - name: Deploy
-              uses: easingthemes/ssh-deploy@v2
+              uses: easingthemes/ssh-deploy@v4
               with:
                   SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
                   ARGS: '-rltgoDzvO -i'
