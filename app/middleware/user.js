@@ -7,11 +7,12 @@ const utils = require('../common/utils');
 module.exports = {
     userHandle: function userHandle() {
         return async function commonHandleMiddleware(ctx, next) {
-            if (!ctx.session.uid) {
+            if (ctx.session.isNew) {
                 ctx.session.visitCount = 0;
-                ctx.session.uid = await utils.uid();
+                ctx.session.uid = utils.uid();
                 ctx.session.lastVisit = utils.timestamp();
             }
+            !ctx.session.nickname && (ctx.session.nickname = utils.faker.name());
             await next();
             ctx.session.visitCount += 1;
             ctx.session.lastVisit = utils.timestamp();

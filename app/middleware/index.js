@@ -38,7 +38,7 @@ module.exports = {
                 }
                 // Check if the response Content-Type is JSON
                 const responseType = ctx.response.headers['content-type'];
-                if ((responseType && responseType.includes('application/json')) || !ctx.body) {
+                if (responseType && responseType.includes('application/json')) {
                     // time consuming x ms
                     res.duration = Date.now() - startTime;
                     res.status = ctx.response.status;

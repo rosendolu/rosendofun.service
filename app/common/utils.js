@@ -1,8 +1,11 @@
 const dayjs = require('dayjs');
 const path = require('path');
 const fs = require('fs');
+const { v4: uuidV4 } = require('uuid');
+const faker = require('chance').Chance();
 
 module.exports = {
+    faker,
     timestamp: function timestamp() {
         return dayjs().format('YYYY-MM-DD HH:mm:ss');
     },
@@ -17,7 +20,6 @@ module.exports = {
         });
     },
     uid: async function uid(len = 16) {
-        const { nanoid } = await import('nanoid');
-        return nanoid(len);
+        return uuidV4();
     },
 };
