@@ -46,13 +46,14 @@ jobs:
                   REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
                   REMOTE_USER: ${{ secrets.REMOTE_USER }}
                   TARGET: ${{ secrets.REMOTE_TARGET }}
-                  EXCLUDE: '/temp/,/.git/,/logs/,/.github/'
+                  EXCLUDE: '/temp/,/logs/,/.github/'
                   SCRIPT_BEFORE: |
                       pwd
                       whoami
                       ls -al
                   SCRIPT_AFTER: |
                       cd ${{ secrets.REMOTE_TARGET }}
+                      git pull
                       touch ~/rsync.log
                       pwd
                       bash ./script/deploy.sh
