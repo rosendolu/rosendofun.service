@@ -1,4 +1,4 @@
-# rosendofun.service ![Last Commit](https://badgen.net/github/last-commit/rosendolu/rosendofun.service?label=🟣%20Updated&labelColor=black&color=448AFF&cache=9999)
+# rosendofun.service ![Last Commit](https://badgen.net/github/last-commit/rosendolu/rosendofun.service?label=🟣%20Updated&labelColor=black&color=448AFF)
 
 > Request rate limit `10r/s` **_Exceeded `ip` will be banned_**
 >
