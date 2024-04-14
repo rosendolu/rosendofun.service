@@ -13,10 +13,11 @@ else
     echo "nvm is not installed or not available in the current shell environment."
 fi
 
-npm ci
+npm ci >/dev/null 2>&1
 
 # Define the name of the PM2 process
 PM2_PROCESS_NAME="rosendofun.service"
+pm2="/root/.nvm/versions/node/v20.10.0/bin/pm2"
 
 # Check if the PM2 process exists
 reloadCode=pm2 list | grep -q "\<$PM2_PROCESS_NAME\>"
