@@ -5,6 +5,7 @@ module.exports = router => {
         const { visitCount, uid, lastVisit } = ctx.session;
         ctx.body = {
             message: `Last visit ${dayjs().to(dayjs(lastVisit))}!`,
+            visitCount: visitCount,
             lastVisit: lastVisit,
             uid,
             serverTime: utils.timestamp(),
