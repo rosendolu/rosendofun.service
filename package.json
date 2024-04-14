@@ -5,8 +5,8 @@
     "description": "rosendofun.service",
     "main": "app/index.js",
     "scripts": {
-        "preinstall": "nvm use",
         "dev": "nodemon app/index.js",
+        "preprod": "npm ci",
         "prod": "pm2 start ecosystem.config.js"
     },
     "repository": {

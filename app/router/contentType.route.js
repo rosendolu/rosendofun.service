@@ -7,12 +7,8 @@ const utils = require('../common/utils');
 module.exports = router => {
     router
         .get('/res/json', ctx => {
-            ctx.body = {
-                query: ctx.query,
-                params: ctx.params,
-                postBody: ctx.request.body,
-                session: ctx.session.toJSON(),
-            };
+            ctx.type = 'application/json';
+            ctx.body = getStaticFile('index.json');
         })
         .get('/res/html', ctx => {
             ctx.type = 'text/html';
