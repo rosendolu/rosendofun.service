@@ -47,12 +47,8 @@ jobs:
                   REMOTE_USER: ${{ secrets.REMOTE_USER }}
                   TARGET: ${{ secrets.REMOTE_TARGET }}
                   EXCLUDE: '/temp/,/.git/,/logs/,/.github/'
-                  SCRIPT_BEFORE: |
-                      pwd
-                      whoami
-                      ls -al
+                  # SCRIPT_BEFORE: |
                   SCRIPT_AFTER: |
                       cd ${{ secrets.REMOTE_TARGET }}
-                      touch ~/rsync2.log
-                      pwd
+                      source ~/.zshrc
                       bash ./script/deploy.sh
