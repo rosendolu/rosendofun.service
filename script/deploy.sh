@@ -19,9 +19,8 @@ npm ci >/dev/null 2>&1
 PM2_PROCESS_NAME="rosendofun.service"
 
 # Check if the PM2 process exists
-reloadCode=pm2 ls | grep -q "\<$PM2_PROCESS_NAME\>"
-
-if [ $reloadCode -eq 0 ]; then
+pm2 ls | grep -q "\<$PM2_PROCESS_NAME\>"
+if [ $? -eq 0 ]; then
     # If the process exists, reload it
     echo "Reloading PM2 process: $PM2_PROCESS_NAME"
     pm2 reload $PM2_PROCESS_NAME --update-env
