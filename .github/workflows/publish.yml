@@ -41,7 +41,7 @@ jobs:
               uses: easingthemes/ssh-deploy@v4
               with:
                   SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-                  ARGS: '-rltgoDzvO -i'
+                  ARGS: '-rltgoDzvO'
                   SOURCE: './'
                   REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
                   REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -50,5 +50,6 @@ jobs:
                   # SCRIPT_BEFORE: |
                   SCRIPT_AFTER: |
                       cd ${{ secrets.REMOTE_TARGET }}
+                      chsh -s $(which zsh)
                       source ~/.zshrc
                       bash ./script/deploy.sh
