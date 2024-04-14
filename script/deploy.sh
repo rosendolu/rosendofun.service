@@ -13,7 +13,7 @@ else
     echo "nvm is not installed or not available in the current shell environment."
 fi
 
-npm ci >/dev/null 2>&1
+npm ci
 
 # Define the name of the PM2 process
 PM2_PROCESS_NAME="rosendofun.service"

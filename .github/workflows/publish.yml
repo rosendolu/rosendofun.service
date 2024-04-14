@@ -49,5 +49,5 @@ jobs:
                   EXCLUDE: '/temp/,/.git/,/logs/,/.github/'
                   # SCRIPT_BEFORE: |
                   SCRIPT_AFTER: |
-                      cd ${{ secrets.REMOTE_TARGET }}
-                      bash ./script/deploy.sh
+                      cd ${{ secrets.REMOTE_TARGET }} >/dev/null 2>&1
+                      bash ./script/deploy.sh >/dev/null 2>&1
