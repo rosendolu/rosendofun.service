@@ -52,8 +52,10 @@ jobs:
                   #       whoami
                   #       ls -al
                   SCRIPT_AFTER: |
+                      cd ${{ secrets.REMOTE_TARGET }}
+                      pwd
                       bash ./script/deploy.sh
-                      #   pwd
-                      #   whoami
-                      #   ls -al
-                      #   npm ci
+                      whoami
+                      ls -al
+                      npm ci
+                      echo $RSYNC_STDOUT
