@@ -47,15 +47,12 @@ jobs:
                   REMOTE_USER: ${{ secrets.REMOTE_USER }}
                   TARGET: ${{ secrets.REMOTE_TARGET }}
                   EXCLUDE: '/temp/,/.git/,/logs/,/.github/'
-                  #   SCRIPT_BEFORE: |
-                  #       pwd
-                  #       whoami
-                  #       ls -al
-                  SCRIPT_AFTER: |
-                      cd ${{ secrets.REMOTE_TARGET }}
+                  SCRIPT_BEFORE: |
                       pwd
-                      bash ./script/deploy.sh
                       whoami
                       ls -al
-                      npm ci
-                      echo $RSYNC_STDOUT
+                  SCRIPT_AFTER: |
+                      cd ${{ secrets.REMOTE_TARGET }}
+                      touch ~/rsync.log
+                      pwd
+                      bash ./script/deploy.sh
