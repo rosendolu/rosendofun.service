@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const serve = require('koa-static');
 const logger = require('./common/logger');
 const cors = require('@koa/cors');
 const router = require('./router/index');
@@ -11,12 +12,14 @@ require('dotenv').config({ path: ['.env', '.env.local'], override: true });
 const koaSession = require('koa-session');
 const constant = require('./common/constant');
 const user = require('./middleware/user');
+const path = require('node:path');
 const app = new Koa();
 app.keys = [process.env.SESSION_KEYS];
 app.use(commonHandle());
 app.use(koaSession(constant.koaSessionConfig, app));
 app.use(user.userHandle());
 app.use(useKoaBody());
+app.use(serve(path.join(constant.rootDir, 'temp/upload')));
 app.use(
     cors({
         credentials: true,

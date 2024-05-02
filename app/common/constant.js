@@ -1,5 +1,8 @@
+const path = require('path');
+
 module.exports = {
     isProdEnv: !/dev/i.test(process.env.NODE_ENV || ''),
+    rootDir: path.resolve(__dirname, '../../'),
     koaSessionConfig: {
         maxAge: 864e5 * 3e4, //  3e4 days
         httpOnly: true /** (boolean) httpOnly or not (default true) */,

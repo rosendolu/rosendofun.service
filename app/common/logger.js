@@ -1,9 +1,11 @@
 const winston = require('winston');
 const utils = require('./utils');
 const path = require('path');
-const { isProdEnv } = require('./constant');
+const { isProdEnv, rootDir } = require('./constant');
+const { ensureDirSync } = require('fs-extra');
 
-const appLogPath = path.resolve('logs', utils.timestamp().split(' ')[0]);
+const appLogPath = path.resolve(rootDir, 'temp/logs', utils.timestamp().split(' ')[0]);
+ensureDirSync(appLogPath);
 const loggerFileNameList = ['app'];
 
 const fileFormat = winston.format.combine(

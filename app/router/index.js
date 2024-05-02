@@ -2,9 +2,9 @@ const Router = require('@koa/router');
 const { glob } = require('glob');
 const logger = require('../common/logger');
 const path = require('path');
-const { isProdEnv } = require('../common/constant');
+const { isProdEnv, rootDir } = require('../common/constant');
 const router = new Router();
-const routerFiles = glob.sync('./**/*.route.js', { cwd: path.resolve('./app/router') });
+const routerFiles = glob.sync('./**/*.route.js', { cwd: path.resolve(rootDir, 'app/router') });
 
 if (!isProdEnv) {
     logger.debug('Router/index.js %O', routerFiles);

@@ -1,7 +1,8 @@
 const { koaBody } = require('koa-body');
 const path = require('path');
 const logger = require('../common/logger');
-const { isProdEnv } = require('../common/constant');
+const { isProdEnv, rootDir } = require('../common/constant');
+const { ensureDirSync } = require('fs-extra');
 
 module.exports = {
     commonHandle: function commonHandle() {
@@ -49,6 +50,8 @@ module.exports = {
         };
     },
     useKoaBody: function useKoaBody() {
+        const uploadDir = path.resolve(rootDir, 'temp/upload');
+        ensureDirSync(uploadDir);
         return koaBody({
             multipart: true,
             jsonLimit: '100mb',
@@ -56,7 +59,7 @@ module.exports = {
             textLimit: '100mb',
             formidable: {
                 maxFieldsSize: 100 * 1024 * 1024, // 100mb
-                uploadDir: path.resolve('./temp'),
+                uploadDir: uploadDir,
                 keepExtensions: true,
             },
         });

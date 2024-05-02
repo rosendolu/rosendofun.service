@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const utils = require('../common/utils');
+
 module.exports = router => {
     router.all('/', ctx => {
         const { nickname, visitCount, uid, lastVisit } = ctx.session;

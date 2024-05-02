@@ -4,6 +4,7 @@ const { getStaticFile } = require('../common/utils');
 const logger = require('../common/logger');
 const utils = require('../common/utils');
 const JSONStream = require('../common/jsonStream');
+const { rootDir } = require('../common/constant');
 
 const prefix = '/res';
 module.exports = router => {
@@ -53,9 +54,7 @@ module.exports = router => {
                     ctx.type = 'application/json';
                     // WARNNING json must be write one-time
                     // ctx.body = getStaticFile('index.json');
-                    ctx.body = JSON.parse(
-                        fs.readFileSync(path.resolve(__dirname, '../../static/index.json')).toString()
-                    );
+                    ctx.body = JSON.parse(fs.readFileSync(path.resolve(rootDir, 'static/index.json')).toString());
                     break;
             }
             await next();
