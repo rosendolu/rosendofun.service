@@ -19,7 +19,7 @@ module.exports = {
             }, ms);
         });
     },
-    uid: async function uid() {
+    uid: function uid() {
         return uuidV4();
     },
 };
