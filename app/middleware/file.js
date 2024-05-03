@@ -16,7 +16,11 @@ module.exports = {
             const userFilePath = path.join(rootDir, 'temp/upload/', uid, newFilename);
             await ensureDir(path.dirname(userFilePath));
             await move(filepath, userFilePath, { overwrite: true });
-            ctx.body = newFilename;
+            ctx.body = {
+                path: userFilePath,
+                mimetype,
+                size,
+            };
         }
         await next();
     },
