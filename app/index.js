@@ -16,15 +16,15 @@ const path = require('node:path');
 const app = new Koa();
 app.keys = [process.env.SESSION_KEYS];
 app.use(commonHandle());
-app.use(koaSession(constant.koaSessionConfig, app));
-app.use(user.userHandle());
-app.use(useKoaBody());
-app.use(serve(path.join(constant.rootDir, 'temp/upload')));
 app.use(
     cors({
         credentials: true,
     })
 );
+app.use(koaSession(constant.koaSessionConfig, app));
+app.use(user.userHandle());
+app.use(useKoaBody());
+app.use(serve(path.join(constant.rootDir, 'temp/upload')));
 app.use(router.routes()).use(router.allowedMethods());
 
 const port = process.env.PORT;
