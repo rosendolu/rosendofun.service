@@ -6,4 +6,31 @@
 
 [![Star History Chart](https://api.star-history.com/svg?repos=rosendolu/rosendofun.service&type=Timeline)](https://github.com/rosendolu/rosendofun.service#readme)
 
+## Development
+
+1. Config env
+
+Create env file `touch .env.local`
+
+```yaml
+SESSION_KEYS=xxxxxx
+```
+
+2. Create secret key
+
+```sh
+mkdir local
+cd local
+openssl genpkey -algorithm RSA -out private_key.pem
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
+3. Deploy
+
+```sh
+npm run prod
+```
+
+## [HTTP](doc/http.md)
+
 ## [File](doc/file.md)

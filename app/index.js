@@ -1,3 +1,5 @@
+require('dotenv').config({ path: ['.env', '.env.local'], override: true });
+
 const Koa = require('koa');
 const serve = require('koa-static');
 const logger = require('./common/logger');
@@ -8,13 +10,14 @@ const relativeTime = require('dayjs/plugin/relativeTime');
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
 const { commonHandle, useKoaBody } = require('./middleware');
-require('dotenv').config({ path: ['.env', '.env.local'], override: true });
 const koaSession = require('koa-session');
 const constant = require('./common/constant');
 const user = require('./middleware/user');
 const path = require('node:path');
+const env = require('./common/env');
 const app = new Koa();
-app.keys = [process.env.SESSION_KEYS];
+app.keys = [env.SESSION_KEYS];
+
 app.use(commonHandle());
 app.use(
     cors({
@@ -27,7 +30,6 @@ app.use(useKoaBody());
 app.use(serve(path.join(constant.rootDir, 'temp/upload')));
 app.use(router.routes()).use(router.allowedMethods());
 
-const port = process.env.PORT;
-app.listen(port, () => {
-    logger.info(`Server running at http://localhost:%s`, port);
+app.listen(env.PORT, () => {
+    logger.info(`Server running at http://localhost:%s`, env.PORT);
 });

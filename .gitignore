@@ -5,3 +5,4 @@ logs/*
 *.log
 *.local
 temp/
+debug/

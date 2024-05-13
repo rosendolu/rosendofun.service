@@ -12,5 +12,7 @@
         "source.sortImports": "always",
         "source.fixAll.eslint": "always"
     },
-    "cSpell.words": ["rosendofun"]
+    "cSpell.words": ["rosendofun"],
+    "outline.showConstants": false,
+    "breadcrumbs.showConstants": false
 }
