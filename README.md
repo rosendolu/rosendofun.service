@@ -13,7 +13,7 @@
 Create env file `touch .env.local`
 
 ```yaml
-SESSION_KEYS=xxxxxx
+SECRET_KEYS=xxxxxx
 ```
 
 2. Create secret key

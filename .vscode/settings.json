@@ -14,5 +14,9 @@
     },
     "cSpell.words": ["rosendofun"],
     "outline.showConstants": false,
-    "breadcrumbs.showConstants": false
+    "breadcrumbs.showConstants": false,
+    "emmet.includeLanguages": {
+        "javascript": "off",
+        "typescript": "off"
+    }
 }

@@ -8,8 +8,6 @@ const jwt = require('jsonwebtoken');
 const dayjs = require('dayjs');
 const env = require('../common/env');
 const { assert } = require('console');
-const PRIVATE_KEY = fs.readFileSync(path.resolve(rootDir, 'local/private_key.pem'));
-const PUBLIC_KEY = fs.readFileSync(path.resolve(rootDir, 'local/public_key.pem'));
 
 module.exports = {
     userHandle() {
@@ -26,18 +24,31 @@ module.exports = {
         };
     },
     userInfo(ctx, next) {
-        const { token, nickname, visitCount, uid, lastVisit } = ctx.session;
+        const { token, nickname, visitCount, uid, lastVisit, role, auth, secret } = ctx.session;
         ctx.body = {
             message: `Last visit ${dayjs().to(dayjs(lastVisit))}!`,
             visitCount: visitCount,
             lastVisit: lastVisit,
             nickname,
+            role,
             token: token || '',
+            secret,
+            auth,
         };
+    },
+    userLogout(ctx, next) {
+        ctx.session.auth = '';
+        ctx.session.secret = '';
+        ctx.session.token = '';
+        ctx.session.role = 'guest';
+        // ctx.set('WWW-Authenticate', 'Basic realm="Logged Out"');
+        // ctx.status = 401;
+        // ctx.body = 'logout';
+        return ctx.redirect(ctx.router.url('userInfo'));
     },
     userLogin(ctx, next) {
         // post body
-        let { username, password } = ctx.request.body;
+        let { username, password } = Object.assign({}, ctx.request.body, ctx.query);
         const auth = ctx.headers['authorization'];
         if ((!username || !password) && auth && auth.indexOf('Basic ') !== -1) {
             const credentials = Buffer.from(auth.split(' ')[1], 'base64').toString().split(':');
@@ -46,18 +57,21 @@ module.exports = {
         }
 
         if (username && password) {
-            ctx.session.username = username;
-            ctx.session.password = password;
-            // admin jwt token
-            if (env.ADMIN_WHITELIST.includes(`${username}:${password}`)) {
-                const payload = { uid: ctx.session.uid, username, timestamp: utils.timestamp() }; // 设置有效载荷
-                const token = jwt.sign(payload, PRIVATE_KEY, {
-                    algorithm: 'RS256',
-                    issuer: env.SERVICE_NAME,
-                    expiresIn: '5d',
-                });
-                ctx.session.token = token;
-            }
+            const secret = `${username}:${password}`;
+            ctx.session.token = utils.hmac(secret);
+            ctx.session.secret = utils.rsa.encryptRSA(secret);
+            // 设置有效载荷
+            const payload = {
+                username,
+                role: env.ADMIN_WHITELIST.includes(secret) ? 'admin' : 'guest',
+            };
+            const authToken = jwt.sign(payload, env.PRIVATE_KEY, {
+                algorithm: 'RS256',
+                issuer: env.SERVICE_NAME,
+                expiresIn: '5d',
+            });
+            Object.assign(ctx.session, payload);
+            ctx.session.auth = authToken;
             return ctx.redirect(ctx.router.url('userInfo'));
         }
         ctx.status = 401;
@@ -65,9 +79,13 @@ module.exports = {
         ctx.body = 'Unauthorized';
     },
     async adminAuth(ctx, next) {
-        const token = ctx.session.token || '';
+        const token = ctx.session.auth || '';
         try {
-            const decoded = jwt.verify(token, PUBLIC_KEY, { issuer: env.SERVICE_NAME });
+            /**
+             * @type {any}
+             * */
+            const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
+            assert(decoded.role === 'admin', 'Not admin user %s', decoded);
             ctx.status = 200;
             ctx.body = decoded;
             await next();

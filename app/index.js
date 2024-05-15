@@ -16,7 +16,7 @@ const user = require('./middleware/user');
 const path = require('node:path');
 const env = require('./common/env');
 const app = new Koa();
-app.keys = [env.SESSION_KEYS];
+app.keys = [env.SECRET_KEYS];
 
 app.use(commonHandle());
 app.use(
