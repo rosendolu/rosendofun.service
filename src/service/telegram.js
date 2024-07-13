@@ -9,7 +9,7 @@ class Service extends CreateCompose {
         super();
         this.token = process.env.TG_TOKEN;
         this.groupId = process.env.TG_GROUP_ID;
-        this.bot = new TelegramBot(this.token, { polling: true });
+        this.bot = new TelegramBot(this.token);
         this.init();
     }
     init() {
