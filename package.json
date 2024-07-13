@@ -38,6 +38,7 @@
         "koa-session": "^6.4.0",
         "koa-static": "^5.0.0",
         "node-binance-api": "github:auto-helper/node-binance-api",
+        "node-telegram-bot-api": "^0.66.0",
         "technicalindicators": "^3.1.0",
         "uuid": "^9.0.1",
         "winston": "^3.13.0",

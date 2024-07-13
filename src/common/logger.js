@@ -67,8 +67,8 @@ function loggerOptions(key) {
 }
 
 const logger = getLogger('app');
-process.on('uncaughtException', err => logger.error('uncaughtException %s', err));
-process.on('uncaughtExceptionMonitor', err => logger.error('uncaughtExceptionMonitor %s', err));
+process.on('uncaughtException', err => logger.error('uncaughtException %s', err.toString()));
+process.on('uncaughtExceptionMonitor', err => logger.error('uncaughtExceptionMonitor %s', err.toString()));
 process.on('unhandledRejection', err => logger.error('unhandledRejection %s', err));
 
 function getLogger(type = 'app') {

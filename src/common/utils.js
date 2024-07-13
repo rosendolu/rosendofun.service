@@ -25,7 +25,7 @@ async function delay(ms) {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve(1);
-        }, ms);
+        }, timeFn(ms));
     });
 }
 function betweenMinMax(min, max) {
@@ -43,7 +43,7 @@ function createConcurrent(concurrency, msFn) {
         pendingCount++;
         try {
             await Promise.resolve(callback());
-            await delay(msFn());
+            await delay(msFn);
         } finally {
             pendingCount--;
             if (queue.length > 0) {
@@ -69,7 +69,7 @@ async function waitFor(fn, msFn, maxCount = -1) {
         if (maxCount != -1 && pollCount > maxCount) {
             return reject(`maxCount limit, maxCount`);
         }
-        await delay(msFn());
+        await delay(msFn);
         callback(resolve, reject);
     }
     return new Promise((resolve, reject) => callback(resolve, reject));
@@ -126,7 +126,29 @@ function displayDuration(date) {
     }`;
 }
 
+function timeFn(ms) {
+    if (typeof ms === 'function') {
+        return ms();
+    }
+    return ms;
+}
+
+function throttledCallback(ms) {
+    let pending = false;
+    return async callback => {
+        try {
+            if (pending) return;
+            pending = true;
+            await Promise.resolve(callback());
+        } catch (error) {}
+        await delay(ms);
+        pending = false;
+    };
+}
+
 module.exports = {
+    timeFn,
+    throttledCallback,
     displayDuration,
     faker,
     betweenMinMax,

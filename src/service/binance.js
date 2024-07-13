@@ -1,17 +1,25 @@
 const Binance = require('node-binance-api');
 const CreateCompose = require('../common/useCompose');
 const { getLogger } = require('../common/logger');
+const { isProdEnv } = require('../common/constant');
 const log = getLogger('binance');
 const binance = new Binance().options({
     useServerTime: true,
     reconnect: true,
-    verbose: true,
+    verbose: isProdEnv ? false : true,
     family: 4,
     log: (...params) => log.debug(params),
     APIKEY: process.env.BINANCE_APIKEY,
     APISECRET: process.env.BINANCE_APISECRET,
 });
 
+process.on('beforeExit', () => {
+    // List all endpoints
+    const endpoints = binance.websockets.subscriptions();
+    for (let endpoint in endpoints) {
+        binance.websockets.terminate(endpoint);
+    }
+});
 class Service extends CreateCompose {
     constructor() {
         super();
@@ -33,6 +41,25 @@ class Service extends CreateCompose {
             this.symbolMap.set(res.symbol, res);
             // log.info('spot symbols %s', list.length);
         });
+        // this.api.prevDay(false, (error, prevDay) => {
+        //     if (error) {
+        //         log.error('prevDay %s', error.toString());
+        //         return;
+        //     }
+        //     let symbolSet = new Set();
+        //     for (let obj of prevDay) {
+        //         let symbol = obj.symbol;
+        //         this.symbolMap.set(symbol, obj);
+        //         symbolSet.add(symbol);
+        //     }
+        //     log.info('prevDay symbols %s', symbolSet.size);
+        //     // https://binance-docs.github.io/apidocs/spot/cn/#12907e94be
+        //     this.api.websockets.candlesticks([...symbolSet].slice(0, 100), '1d', candlestickData => {
+        //         let tick = binance.last(candlestickData);
+        //         const symbol = candlestickData.s;
+        //         const close = candlestickData[tick].c;
+        //     });
+        // });
         this.api.exchangeInfo((error, data) => {
             if (error) {
                 log.error('exchangeInfo %s', error.toString());
