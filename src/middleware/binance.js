@@ -73,9 +73,9 @@ module.exports = {
     },
     async matchIndicators(ctx, next) {
         const { kdj, macd, boll, symbol, interval } = ctx;
-        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.j <= 10) {
+        if (boll.pb <= 0.1 && macd.MACD <= 0 && kdj.j <= 10) {
             ctx.action = 'buy';
-        } else if (boll.pb >= 0.5 && macd.histogram >= 0 && kdj.j >= 100) {
+        } else if (boll.pb >= 0.5 && macd.MACD >= 0 && kdj.j >= 100) {
             ctx.action = 'sell';
         }
         ctx.action &&

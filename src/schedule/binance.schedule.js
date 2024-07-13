@@ -4,7 +4,6 @@ const binance = require('../service/binance');
 const { getLogger } = require('../common/logger');
 const utils = require('../common/utils');
 const dayjs = require('dayjs');
-const { start } = require('repl');
 const log = getLogger('binance');
 
 binance.use('spot/candlesticks', getCandlesticks, calculateIndicators, matchIndicators);
