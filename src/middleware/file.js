@@ -5,7 +5,7 @@ const util = require('node:util');
 const { rootDir } = require('../common/constant');
 const { glob } = require('glob');
 const { spawn, exec } = require('child_process');
-const logger = require('../common/logger');
+const { logger } = require('../common/logger');
 module.exports = {
     async uploadFile(ctx, next) {
         const { uid, nickname } = ctx.session;

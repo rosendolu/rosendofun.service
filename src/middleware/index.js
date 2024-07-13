@@ -1,6 +1,6 @@
 const { koaBody } = require('koa-body');
 const path = require('path');
-const logger = require('../common/logger');
+const { logger } = require('../common/logger');
 const { isProdEnv, rootDir } = require('../common/constant');
 const { ensureDirSync } = require('fs-extra');
 

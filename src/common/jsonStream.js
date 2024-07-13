@@ -1,5 +1,5 @@
 const { Transform } = require('stream');
-const logger = require('./logger');
+const { logger } = require('./logger');
 
 // Define a Transform stream to parse JSON objects line by line
 class JSONStream extends Transform {

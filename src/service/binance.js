@@ -1,0 +1,83 @@
+const Binance = require('node-binance-api');
+const CreateCompose = require('../common/useCompose');
+const { getLogger } = require('../common/logger');
+const log = getLogger('binance');
+const binance = new Binance().options({
+    useServerTime: true,
+    reconnect: true,
+    verbose: true,
+    family: 4,
+    log: (...params) => log.debug(params),
+    APIKEY: process.env.BINANCE_APIKEY,
+    APISECRET: process.env.BINANCE_APISECRET,
+});
+
+class Service extends CreateCompose {
+    constructor() {
+        super();
+        this.api = binance;
+        this.symbolMap = new Map();
+        this.symbolFilters = new Map();
+        this.rateLimits = [];
+        // this.exchangeFilters = []
+        this.init();
+    }
+    async init() {
+        // const res = await this.api.openOrders(false);
+        // log.info('Open orders %j', res);
+        this.api.websockets.prevDay(false, (error, res) => {
+            if (error) {
+                log.error('prevDay %s', error.toString());
+            }
+            // {"eventType":"24hrTicker","eventTime":1720847862334,"symbol":"BNBETH","priceChange":"0.00200000","percentChange":"1.186","averagePrice":"0.17010335","prevClose":"0.16860000","close":"0.17070000","closeQty":"0.01400000","bestBid":"0.17060000","bestBidQty":"52.04300000","bestAsk":"0.17070000","bestAskQty":"2.69200000","open":"0.16870000","high":"0.17120000","low":"0.16840000","volume":"2632.09700000","quoteVolume":"447.72852340","openTime":1720761462334,"closeTime":1720847862334,"firstTradeId":60390397,"lastTradeId":60399160,"numTrades":8764}
+            this.symbolMap.set(res.symbol, res);
+            // log.info('spot symbols %s', list.length);
+        });
+        this.api.exchangeInfo((error, data) => {
+            if (error) {
+                log.error('exchangeInfo %s', error.toString());
+            }
+            // {rateLimitType: 'REQUEST_WEIGHT', interval: 'MINUTE', intervalNum: 1, limit: 6000}
+            this.rateLimits = data.rateLimits;
+            // this.exchangeFilters =data.exchangeFilters
+            for (let obj of data.symbols) {
+                let filters = { status: obj.status };
+                for (let filter of obj.filters) {
+                    if (filter.filterType == 'MIN_NOTIONAL') {
+                        filters.minNotional = filter.minNotional;
+                    } else if (filter.filterType == 'PRICE_FILTER') {
+                        filters.minPrice = filter.minPrice;
+                        filters.maxPrice = filter.maxPrice;
+                        filters.tickSize = filter.tickSize;
+                    } else if (filter.filterType == 'LOT_SIZE') {
+                        filters.stepSize = filter.stepSize;
+                        filters.minQty = filter.minQty;
+                        filters.maxQty = filter.maxQty;
+                    }
+                }
+                //filters.baseAssetPrecision = obj.baseAssetPrecision;
+                //filters.quoteAssetPrecision = obj.quoteAssetPrecision;
+                filters.orderTypes = obj.orderTypes;
+                filters.icebergAllowed = obj.icebergAllowed;
+                obj.status === 'TRADING' && this.symbolFilters.set(obj.symbol, filters);
+            }
+            log.info('exchangeInfo: %s', this.symbolFilters.size);
+
+            // global.filters = minimums;
+            //fs.writeFile("minimums.json", JSON.stringify(minimums, null, 4), function(err){});
+        });
+    }
+    usedWeight() {
+        const binance = this.api;
+        const max = this.rateLimits.find(item => item.rateLimitType === 'REQUEST_WEIGHT')?.limit || 0;
+        const used = binance.usedWeight();
+        if (used >= max || max - used <= 30) {
+            log.warn(
+                '%s',
+                `statusCode: ${binance.statusCode()} usedWeight:${binance.usedWeight()} / ${max}  ${binance.lastURL()}`
+            );
+        }
+    }
+}
+
+module.exports = new Service();

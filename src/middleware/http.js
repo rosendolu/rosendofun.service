@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { getStaticFile } = require('../common/utils');
-const logger = require('../common/logger');
+const { logger } = require('../common/logger');
 const utils = require('../common/utils');
 const JSONStream = require('../common/jsonStream');
 const { rootDir } = require('../common/constant');

@@ -2,7 +2,7 @@
     "restartable": "rs",
     "ignore": [".git", "node_modules/*", "local/*", "script/*", ".vscode/**/*", "./dist/**/*"],
     "verbose": true,
-    "watch": ["./app"],
+    "watch": ["./src"],
     "env": {
         "NODE_ENV": "dev"
     },
