@@ -4,11 +4,13 @@ const { getLogger } = require('../common/logger');
 const utils = require('../common/utils');
 const log = getLogger();
 
-const bot = new TelegramBot(this.token, { polling: true, webHook: true });
+const token = process.env.TG_TOKEN;
+const bot = new TelegramBot(token, { polling: true });
+
 class Service extends CreateCompose {
     constructor() {
         super();
-        this.token = process.env.TG_TOKEN;
+        this.token = token;
         this.groupId = process.env.TG_GROUP_ID;
         this.bot = bot;
         this.init();
