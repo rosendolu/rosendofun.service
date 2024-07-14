@@ -134,7 +134,7 @@ module.exports = {
         if (symbolMap.size === 0) return;
         const topGainer = [...symbolMap.values()]
             .sort((a, b) => Number(b.percentChange) - Number(a.percentChange))
-            .slice(0, 6)
+            .slice(0, 10)
             .map(item => [item.symbol, item.percentChange]);
 
         ctx.eventName = 'topGainer';

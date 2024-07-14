@@ -29,7 +29,7 @@ utils.waitFor(
 
         log.info('calculated %s symbols %s', iter.length, utils.displayDuration(start));
     },
-    () => 15 * 6e4
+    () => 10 * 6e4
 );
 
 // spot/24hrTicker
