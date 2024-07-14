@@ -27,8 +27,9 @@ app.use(
 );
 app.use(koaSession(constant.koaSessionConfig, app));
 app.use(user.userHandle());
+app.use(user.adminRouterAuth());
 app.use(useKoaBody());
-app.use(serve(path.join(constant.rootDir, 'temp/upload')));
+app.use(serve(path.join(constant.rootDir, 'temp'), { maxage: 0, hidden: false }));
 app.use(router.routes()).use(router.allowedMethods());
 require('./schedule/index');
 app.listen(env.PORT, () => {

@@ -6,6 +6,7 @@ const utils = require('../common/utils');
 const telegram = require('../service/telegram');
 const mail = require('../service/mail');
 const log = getLogger('binance');
+const util = require('node:util');
 
 const concurrentSend = utils.createConcurrent(2, 1e3);
 
@@ -84,16 +85,20 @@ module.exports = {
         } else if (boll.pb >= 0.5 && macd.histogram >= 0 && kdj.j >= 90) {
             ctx.action = 'sell';
         }
+        const str = util.format(
+            '%s %s [%s] indicator: BOLL: %j ,MACD: %j , KDJ: %j',
+            symbol,
+            interval,
+            ctx.action || '',
+            ctx.boll,
+            ctx.macd,
+            ctx.kdj
+        );
+        if (kdj.j < 10 || kdj.j > 90 || boll.pb <= 0.1 || boll.pb >= 0.9 || macd.histogram <= 0) {
+            log.info(str);
+        }
         if (ctx.action) {
-            log.warn(
-                '%s %s [%s] indicator: BOLL: %j ,MACD: %j , KDJ: %j',
-                symbol,
-                interval,
-                ctx.action,
-                ctx.boll,
-                ctx.macd,
-                ctx.kdj
-            );
+            log.warn(str);
             concurrentSend(async () => {
                 await Promise.allSettled([
                     feishu.send({

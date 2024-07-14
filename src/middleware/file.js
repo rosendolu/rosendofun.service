@@ -6,7 +6,29 @@ const { rootDir } = require('../common/constant');
 const { glob } = require('glob');
 const { spawn, exec } = require('child_process');
 const { logger } = require('../common/logger');
+const handler = require('serve-handler');
+
 module.exports = {
+    useServeTempDir() {
+        return async (ctx, next) => {
+            // if (ctx.path.startsWith('/admin/temp')) {
+            // ctx.req.url = ctx.req.url.replace(/^\/admin\/temp/, '');
+            await handler(ctx.req, ctx.res, {
+                public: 'temp',
+                cleanUrls: true,
+                // rewrites: [{ source: /^\/admin\/temp\/?/, destination: '/' }],
+                // rewrites: [
+                //     // { source: /^\/admin\/temp/, destination: '/' },
+                //     { source: '/admin/temp/logs/:path', destination: '/logs/:path' },
+                //     { source: '/admin/temp/logs', destination: '/logs' },
+                //     { source: '/admin/temp', destination: '/' },
+                // ],
+            });
+            // } else {
+            //     await next();
+            // }
+        };
+    },
     async uploadFile(ctx, next) {
         const { uid, nickname } = ctx.session;
         let fileArr = [];
