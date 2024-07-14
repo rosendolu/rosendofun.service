@@ -124,10 +124,12 @@ module.exports = {
         const { symbolMap } = ctx;
         if (symbolMap.size === 0) return;
         const topGainer = [...symbolMap.values()]
-            .sort((a, b) => Number(b[1].percentChange) - Number(a[1].percentChange))
-            .slice(0, 6);
+            .sort((a, b) => Number(b.percentChange) - Number(a.percentChange))
+            .slice(0, 6)
+            .map(item => [item.symbol, item.percentChange]);
+
         ctx.eventName = 'topGainer';
-        log.info('topGainer %j', ctx.eventName);
+        log.info('%s %j', ctx.eventName, topGainer);
         feishu.send({
             title: ctx.eventName,
             content: [
