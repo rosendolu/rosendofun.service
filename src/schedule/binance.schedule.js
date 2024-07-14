@@ -36,7 +36,7 @@ utils.waitFor(
 binance.use('spot/24hrTicker', detectPriceChange);
 utils.waitFor(
     async function () {
-        binance.trigger('spot/24hrTicker', { symbolMap: binance.symbolMap });
+        await binance.trigger('spot/24hrTicker', { symbolMap: binance.symbolMap });
     },
     () => 60 * 6e4
 );

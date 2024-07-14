@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidV4 } = require('uuid');
 const env = require('./env');
-const { text } = require('stream/consumers');
 const { log } = require('console');
 const faker = require('chance').Chance();
 

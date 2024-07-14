@@ -79,9 +79,9 @@ module.exports = {
     },
     async matchIndicators(ctx, next) {
         const { kdj, macd, boll, symbol, interval } = ctx;
-        if (boll.pb <= 0.1 && macd.MACD <= 0 && kdj.j <= 10) {
+        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.j <= 10) {
             ctx.action = 'buy';
-        } else if (boll.pb >= 0.5 && macd.MACD >= 0 && kdj.j >= 100) {
+        } else if (boll.pb >= 0.5 && macd.histogram >= 0 && kdj.j >= 90) {
             ctx.action = 'sell';
         }
         if (ctx.action) {
@@ -94,36 +94,38 @@ module.exports = {
                 ctx.macd,
                 ctx.kdj
             );
-            concurrentSend(() => {
-                feishu.send({
-                    title: ctx.action,
-                    content: [
-                        [
-                            {
-                                tag: 'text',
-                                text: `BOLL:${JSON.stringify(ctx.boll)}\nMACD:${JSON.stringify(
-                                    ctx.macd
-                                )}\nKDJ:${JSON.stringify(ctx.kdj)}\n时间：${utils.timestamp()}`,
-                            },
+            concurrentSend(async () => {
+                await Promise.allSettled([
+                    feishu.send({
+                        title: ctx.action,
+                        content: [
+                            [
+                                {
+                                    tag: 'text',
+                                    text: `BOLL:${JSON.stringify(ctx.boll)}\nMACD:${JSON.stringify(
+                                        ctx.macd
+                                    )}\nKDJ:${JSON.stringify(ctx.kdj)}\n时间：${utils.timestamp()}`,
+                                },
+                            ],
                         ],
-                    ],
-                });
-                telegram.send(
-                    `<b>${symbol} ${interval} ${ctx.action}: </b>\n<pre>BOLL: ${JSON.stringify(
-                        ctx.boll
-                    )}</pre>\n<pre>MACD: ${JSON.stringify(ctx.macd)}</pre>\n<pre>KDJ: ${JSON.stringify(
-                        ctx.kdj
-                    )}</pre>\n`
-                );
-                mail.send({
-                    subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
-                    html: `<p><code><pre>${JSON.stringify(
-                        { BOLL: ctx.boll, MACD: ctx.macd, KDJ: ctx.kdj },
-                        null,
-                        2
-                    )}</pre></code></p>`, // html body
-                });
-            });
+                    }),
+                    telegram.send(
+                        `<b>${symbol} ${interval} ${ctx.action}: </b>\n<pre>BOLL: ${JSON.stringify(
+                            ctx.boll
+                        )}</pre>\n<pre>MACD: ${JSON.stringify(ctx.macd)}</pre>\n<pre>KDJ: ${JSON.stringify(
+                            ctx.kdj
+                        )}</pre>\n`
+                    ),
+                    mail.send({
+                        subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
+                        html: `<p><code><pre>${JSON.stringify(
+                            { BOLL: ctx.boll, MACD: ctx.macd, KDJ: ctx.kdj },
+                            null,
+                            2
+                        )}</pre></code></p>`, // html body
+                    }),
+                ]);
+            }).catch();
         }
 
         await next();
@@ -150,6 +152,6 @@ module.exports = {
                 ],
             ],
         });
-        telegram.send(`<b>${ctx.eventName}: </b>\n<pre>${JSON.stringify(topGainer, null, 2)}</pre>`);
+        telegram.send(`<b>${ctx.eventName}: </b>\n<pre>${JSON.stringify(topGainer)}</pre>`);
     },
 };
