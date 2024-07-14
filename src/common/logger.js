@@ -49,14 +49,14 @@ function loggerOptions(key) {
             zippedArchive: false,
         }),
     ];
-    if (!isProdEnv) {
-        transports.push(
-            // @ts-ignore
-            new winston.transports.Console({
-                format: winston.format.combine(winston.format.colorize(), fileFormat),
-            })
-        );
-    }
+    // if (!isProdEnv) {
+    transports.push(
+        // @ts-ignore
+        new winston.transports.Console({
+            format: winston.format.combine(winston.format.colorize(), fileFormat),
+        })
+    );
+    // }
     return {
         level: isProdEnv ? 'info' : 'debug',
         exitOnError: false,

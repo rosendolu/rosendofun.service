@@ -4,6 +4,7 @@ const binance = require('../service/binance');
 const feishu = require('../service/feishu');
 const utils = require('../common/utils');
 const telegram = require('../service/telegram');
+const mail = require('../service/mail');
 const log = getLogger('binance');
 
 const concurrentSend = utils.createConcurrent(2, 1e3);
@@ -114,6 +115,14 @@ module.exports = {
                         ctx.kdj
                     )}</pre>\n`
                 );
+                mail.send({
+                    subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
+                    html: `<p><code><pre>${JSON.stringify(
+                        { BOLL: ctx.boll, MACD: ctx.macd, KDJ: ctx.kdj },
+                        null,
+                        2
+                    )}</pre></code></p>`, // html body
+                });
             });
         }
 

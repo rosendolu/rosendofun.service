@@ -8,5 +8,8 @@ declare namespace NodeJS {
         TG_TOKEN: string;
         TG_GROUP_ID: string;
         BASEURL_FEISHU: string;
+        MAIL_USER: string;
+        MAIL_PASS: string;
+        MAIL_USER_TO: string;
     }
 }
