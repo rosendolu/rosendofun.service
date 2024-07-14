@@ -1,5 +1,4 @@
-require('dotenv').config({ path: ['.env', '.env.local'], override: true });
-
+require('dotenv').config();
 const Koa = require('koa');
 const serve = require('koa-static');
 const { logger } = require('./common/logger');

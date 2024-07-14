@@ -13,7 +13,7 @@ module.exports = class CreateCompose {
     static async useCallback(channel, ctx) {
         try {
             if (!channel) return;
-            const fn = compose(this.middleware[channel]);
+            const fn = compose(this.middleware[channel] || []);
             await fn(ctx, ctx => Promise.resolve(ctx));
         } catch (err) {
             logger.error(`middleware %s %s`, channel, err.toString());

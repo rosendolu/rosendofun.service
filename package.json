@@ -5,9 +5,9 @@
     "description": "rosendofun.service",
     "main": "src/app.js",
     "scripts": {
-        "dev": "nodemon src/app.js",
-        "start": "node src/app.js",
-        "prod": "pm2 start ecosystem.config.js"
+        "dev": "env-cmd -f ./.env.dev.local nodemon src/app.js",
+        "start": "env-cmd ./.env.local node src/app.js",
+        "prod": "env-cmd ./.env.local pm2 start ecosystem.config.js"
     },
     "repository": {
         "type": "git",

@@ -14,6 +14,10 @@ class Service extends CreateCompose {
         this.groupId = process.env.TG_GROUP_ID;
         this.bot = bot;
         this.init();
+        bot.on('message', msg => {
+            // {"message_id":2,"from":{"id":2020807895,"is_bot":false,"first_name":"Rosendo","username":"rosendoX","language_code":"en"},"chat":{"id":-1002231802147,"title":"Binance Test","type":"supergroup"},"date":1720944214,"text":"xxx","has_protected_content":true}
+            this.trigger('tg/message', msg);
+        });
     }
     init() {
         this.send(`startedAt:${utils.timestamp()}`);
