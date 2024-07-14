@@ -13,9 +13,10 @@ utils.waitFor(
     async function () {
         // Intervals: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
         const iter = [...binance.symbolFilters.keys()];
+        if (iter.length === 0) return;
         // const iter = ['BNBUSDT'];
         let start = dayjs();
-        log.info('symbol size %s', iter.length);
+        log.info('start calculate %s', iter.length);
 
         await Promise.allSettled(
             iter.map(symbol =>
@@ -26,7 +27,7 @@ utils.waitFor(
             )
         );
 
-        log.info('calculate %s symbols %s', iter.length, utils.displayDuration(start));
+        log.info('calculated %s symbols %s', iter.length, utils.displayDuration(start));
     },
     () => 15 * 6e4
 );

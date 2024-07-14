@@ -69,7 +69,7 @@ function loggerOptions(key) {
 const logger = getLogger('app');
 process.on('uncaughtException', err => logger.error('uncaughtException %s', err.toString()));
 process.on('uncaughtExceptionMonitor', err => logger.error('uncaughtExceptionMonitor %s', err.toString()));
-process.on('unhandledRejection', err => logger.error('unhandledRejection %s', err));
+process.on('unhandledRejection', err => logger.error('unhandledRejection %s', isProdEnv ? err?.toString() : err));
 
 function getLogger(type = 'app') {
     return winston.loggers.get(type);

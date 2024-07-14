@@ -145,7 +145,7 @@ module.exports = {
                 [
                     {
                         tag: 'text',
-                        text: `${JSON.stringify(topGainer, null, 2)}\n时间：${utils.timestamp()}`,
+                        text: `${JSON.stringify(topGainer)}\n时间：${utils.timestamp()}`,
                     },
                 ],
             ],

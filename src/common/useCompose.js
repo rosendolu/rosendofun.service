@@ -16,7 +16,7 @@ module.exports = class CreateCompose {
             const fn = compose(this.middleware[channel]);
             await fn(ctx, ctx => Promise.resolve(ctx));
         } catch (err) {
-            logger.error(`CreateCompose middleware %s %s`, channel, err.toString());
+            logger.error(`middleware %s %s`, channel, err.toString());
         }
     }
     trigger(channel, ctx) {
