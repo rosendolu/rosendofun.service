@@ -25,7 +25,7 @@ class Service extends CreateCompose {
     send(str) {
         // ,`<b>title:${(this.globalMap.minDiff * 100).toFixed(2)}%</b>`
         // <pre></pre>
-        bot.sendMessage(this.groupId, str, { parse_mode: 'HTML' });
+        return bot.sendMessage(this.groupId, str, { parse_mode: 'HTML' }).catch();
     }
 }
 

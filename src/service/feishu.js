@@ -16,7 +16,7 @@ class Service extends CreateCompose {
                 },
             },
         };
-        return fetch(this.BASEURL, { method: 'POST', body: JSON.stringify(params) });
+        return fetch(this.BASEURL, { method: 'POST', body: JSON.stringify(params) }).catch();
     }
 }
 

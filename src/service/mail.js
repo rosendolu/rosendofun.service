@@ -48,7 +48,7 @@ class Service extends CreateCompose {
                     }
                 }
             );
-        });
+        }).catch();
     }
 }
 
