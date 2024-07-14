@@ -8,7 +8,7 @@ const log = getLogger('binance');
 
 // candlestick indicator
 binance.use('spot/candlesticks', getCandlesticks, calculateIndicators, matchIndicators);
-let runner = utils.createConcurrent(5, () => utils.betweenMinMax(1, 3) * 1e2);
+let runner = utils.createConcurrent(3, () => utils.betweenMinMax(3, 6) * 1e2);
 utils.waitFor(
     async function () {
         // Intervals: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M

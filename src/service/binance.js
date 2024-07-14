@@ -35,7 +35,7 @@ class Service extends CreateCompose {
         // log.info('Open orders %j', res);
         this.api.websockets.prevDay(false, (error, res) => {
             if (error) {
-                log.error('prevDay %s', error.toString());
+                return log.error('prevDay %s', error.toString());
             }
             // {"eventType":"24hrTicker","eventTime":1720847862334,"symbol":"BNBETH","priceChange":"0.00200000","percentChange":"1.186","averagePrice":"0.17010335","prevClose":"0.16860000","close":"0.17070000","closeQty":"0.01400000","bestBid":"0.17060000","bestBidQty":"52.04300000","bestAsk":"0.17070000","bestAskQty":"2.69200000","open":"0.16870000","high":"0.17120000","low":"0.16840000","volume":"2632.09700000","quoteVolume":"447.72852340","openTime":1720761462334,"closeTime":1720847862334,"firstTradeId":60390397,"lastTradeId":60399160,"numTrades":8764}
             this.symbolMap.set(res.symbol, res);
@@ -62,7 +62,7 @@ class Service extends CreateCompose {
         // });
         this.api.exchangeInfo((error, data) => {
             if (error) {
-                log.error('exchangeInfo %s', error.toString());
+                return log.error('exchangeInfo %s', error.toString());
             }
             // {rateLimitType: 'REQUEST_WEIGHT', interval: 'MINUTE', intervalNum: 1, limit: 6000}
             this.rateLimits = data.rateLimits;
