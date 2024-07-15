@@ -8,7 +8,8 @@ const { log } = require('console');
 const faker = require('chance').Chance();
 
 function timestamp() {
-    return dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const chinaTimezone = 'Asia/Shanghai';
+    return dayjs().tz(chinaTimezone).format('YYYY-MM-DD HH:mm:ss');
 }
 function getStaticFile(fileName) {
     return fs.createReadStream(path.resolve('static', fileName));

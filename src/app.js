@@ -7,9 +7,13 @@ const router = require('./router/index');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const duration = require('dayjs/plugin/duration');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const { commonHandle, useKoaBody } = require('./middleware');
 const koaSession = require('koa-session');
 const constant = require('./common/constant');
