@@ -1,7 +1,6 @@
 const { BollingerBands, MACD, Stochastic } = require('technicalindicators');
 const { getLogger } = require('../common/logger');
 const binance = require('../service/binance');
-const feishu = require('../service/feishu');
 const utils = require('../common/utils');
 const telegram = require('../service/telegram');
 const mail = require('../service/mail');
@@ -80,13 +79,14 @@ module.exports = {
     },
     async matchIndicators(ctx, next) {
         const { kdj, macd, boll, symbol, interval } = ctx;
-        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 20) {
-            ctx.action = 'buy';
-        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 80) {
-            ctx.action = 'sell';
+        if (!kdj || !macd || !boll) return;
+        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 10) {
+            ctx.action = 'BUY';
+        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 90) {
+            ctx.action = 'SELL';
         }
         const str = util.format(
-            '%s %s [%s] indicator: BOLL: %j ,MACD: %j , KDJ: %j',
+            '%s %s [%s] indicator: BOLL: %O ,MACD: %O , KDJ: %O',
             symbol,
             interval,
             ctx.action || '',
@@ -94,43 +94,27 @@ module.exports = {
             ctx.macd,
             ctx.kdj
         );
-        if (kdj.J < 10 || kdj.J > 90 || boll.pb <= 0.1 || boll.pb >= 0.9 || macd.histogram <= 0) {
-            log.info(str);
-        }
+
         if (ctx.action) {
             log.warn(str);
+            const html = `<b>${symbol} ${interval} ${ctx.action}: </b>\n<pre>BOLL: ${JSON.stringify(
+                ctx.boll
+            )}</pre>\n<pre>MACD: ${JSON.stringify(ctx.macd)}</pre>\n<pre>KDJ: ${JSON.stringify(ctx.kdj)}</pre>\n`;
             concurrentSend(async () => {
                 await Promise.allSettled([
-                    feishu.send({
-                        title: ctx.action,
-                        content: [
-                            [
-                                {
-                                    tag: 'text',
-                                    text: `BOLL:${JSON.stringify(ctx.boll)}\nMACD:${JSON.stringify(
-                                        ctx.macd
-                                    )}\nKDJ:${JSON.stringify(ctx.kdj)}\n时间：${utils.timestamp()}`,
-                                },
-                            ],
-                        ],
-                    }),
-                    telegram.send(
-                        `<b>${symbol} ${interval} ${ctx.action}: </b>\n<pre>BOLL: ${JSON.stringify(
-                            ctx.boll
-                        )}</pre>\n<pre>MACD: ${JSON.stringify(ctx.macd)}</pre>\n<pre>KDJ: ${JSON.stringify(
-                            ctx.kdj
-                        )}</pre>\n`
-                    ),
+                    telegram.send(html),
                     mail.send({
                         subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
-                        html: `<p><code><pre>${JSON.stringify(
-                            { BOLL: ctx.boll, MACD: ctx.macd, KDJ: ctx.kdj },
-                            null,
-                            2
-                        )}</pre></code></p>`, // html body
+                        html: html, // html body
                     }),
                 ]);
             }).catch();
+        } else {
+            if (kdj.J < 10 || boll.pb <= 0.1) {
+                log.info('OVER_SOLD ' + str);
+            } else if (kdj.J > 90 || boll.pb >= 0.9) {
+                log.info('OVER_BOUGHT ' + str);
+            }
         }
 
         await next();
@@ -146,17 +130,6 @@ module.exports = {
 
         ctx.eventName = 'topGainer';
         log.info('%s %j', ctx.eventName, topGainer);
-        feishu.send({
-            title: ctx.eventName,
-            content: [
-                [
-                    {
-                        tag: 'text',
-                        text: `${JSON.stringify(topGainer)}\n时间：${utils.timestamp()}`,
-                    },
-                ],
-            ],
-        });
         telegram.send(`<b>${ctx.eventName}: </b>\n<pre>${JSON.stringify(topGainer)}</pre>`);
     },
 };
