@@ -37,7 +37,7 @@ module.exports = {
         };
     },
     userLogout(ctx, next) {
-        ctx.session.auth = '';
+        ctx.session.jwt = '';
         ctx.session.secret = '';
         ctx.session.token = '';
         ctx.session.role = 'guest';
@@ -72,7 +72,7 @@ module.exports = {
                 expiresIn: '5d',
             });
             Object.assign(ctx.session, payload);
-            ctx.session.auth = authToken;
+            ctx.session.jwt = authToken;
             return ctx.redirect(ctx.router.url('userInfo'));
         }
         ctx.status = 401;
@@ -84,7 +84,7 @@ module.exports = {
         if (ctx.path.startsWith('/admin')) {
             let pass = false;
             try {
-                const token = ctx.session.auth || '';
+                const token = ctx.session.jwt || '';
                 /**
                  * @type {any}
                  * */
@@ -105,7 +105,7 @@ module.exports = {
     },
 
     async adminAuth(ctx, next) {
-        const token = ctx.session.auth || '';
+        const token = ctx.session.jwt || '';
         try {
             /**
              * @type {any}
