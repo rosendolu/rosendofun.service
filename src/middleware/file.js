@@ -8,25 +8,35 @@ const { spawn, exec } = require('child_process');
 const { logger } = require('../common/logger');
 const handler = require('serve-handler');
 
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+const apiProxy = createProxyMiddleware({
+    target: 'http://127.0.0.1:3001',
+    changeOrigin: true, // for vhosted sites
+    pathRewrite: {
+        '^/admin/temp/': '/',
+    },
+    on: {
+        proxyReq: (proxyReq, req, res) => {
+            // append Basic Auth
+            proxyReq.setHeader('Authorization', req.session.basicAuth);
+        },
+    },
+});
+
 module.exports = {
     useServeTempDir() {
         return async (ctx, next) => {
-            // if (ctx.path.startsWith('/admin/temp')) {
-            // ctx.req.url = ctx.req.url.replace(/^\/admin\/temp/, '');
-            await handler(ctx.req, ctx.res, {
-                public: 'temp',
-                cleanUrls: true,
-                // rewrites: [{ source: /^\/admin\/temp\/?/, destination: '/' }],
-                // rewrites: [
-                //     // { source: /^\/admin\/temp/, destination: '/' },
-                //     { source: '/admin/temp/logs/:path', destination: '/logs/:path' },
-                //     { source: '/admin/temp/logs', destination: '/logs' },
-                //     { source: '/admin/temp', destination: '/' },
-                // ],
-            });
-            // } else {
-            //     await next();
-            // }
+            if (ctx.path.startsWith('/admin/temp')) {
+                // if (ctx.path !== '/' && !ctx.path.endsWith('/')) {
+                //     ctx.path += '/';
+                // }
+                ctx.respond = false;
+                ctx.req.session = ctx.session;
+                apiProxy(ctx.req, ctx.res, next);
+            } else {
+                await next();
+            }
         };
     },
     async uploadFile(ctx, next) {

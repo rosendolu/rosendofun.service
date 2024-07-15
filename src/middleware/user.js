@@ -59,6 +59,7 @@ module.exports = {
         if (username && password) {
             const secret = `${username}:${password}`;
             ctx.session.token = utils.hmac(secret);
+            ctx.session.basicAuth = auth;
             ctx.session.secret = utils.rsa.encryptRSA(secret);
             // 设置有效载荷
             const payload = {
@@ -78,31 +79,31 @@ module.exports = {
         ctx.set('WWW-Authenticate', 'Basic realm="Restricted Access"');
         ctx.body = 'Unauthorized';
     },
-    adminRouterAuth() {
-        return async (ctx, next) => {
-            if (ctx.path.startsWith('/admin')) {
-                let pass = false;
-                try {
-                    const token = ctx.session.auth || '';
-                    /**
-                     * @type {any}
-                     * */
-                    const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
-                    assert(decoded.role === 'admin', 'Not admin user %s', decoded);
-                    pass = true;
-                } catch (err) {
-                    logger.error('adminRouterAuth %s %j', err, ctx.session);
-                    ctx.status = 401;
-                    ctx.body = 'Unauthorized';
-                }
-                if (true) {
-                    await next();
-                }
-            } else {
+
+    async adminRouterAuth(ctx, next) {
+        if (ctx.path.startsWith('/admin')) {
+            let pass = false;
+            try {
+                const token = ctx.session.auth || '';
+                /**
+                 * @type {any}
+                 * */
+                const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
+                assert(decoded.role === 'admin', 'Not admin user %s', decoded);
+                pass = true;
+            } catch (err) {
+                logger.error('adminRouterAuth %s %j', err, ctx.session);
+                ctx.status = 401;
+                ctx.body = '<h1 style="color:red;text-align:center">401 Unauthorized</h1>';
+            }
+            if (true) {
                 await next();
             }
-        };
+        } else {
+            await next();
+        }
     },
+
     async adminAuth(ctx, next) {
         const token = ctx.session.auth || '';
         try {
