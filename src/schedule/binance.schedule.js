@@ -1,18 +1,27 @@
 const { CronJob } = require('cron');
-const { getCandlesticks, calculateIndicators, matchIndicators, detectPriceChange } = require('../middleware/binance');
+const {
+    getCandlesticks,
+    calculateIndicators,
+    matchIndicators,
+    detectPriceChange,
+    notify,
+} = require('../middleware/binance');
 const binance = require('../service/binance');
 const { getLogger } = require('../common/logger');
 const utils = require('../common/utils');
 const dayjs = require('dayjs');
+const telegram = require('../service/telegram');
+const { isProdEnv } = require('../common/constant');
 const log = getLogger('binance');
 
 // candlestick indicator
-binance.use('spot/candlesticks', getCandlesticks, calculateIndicators, matchIndicators);
+binance.use('spot/candlesticks', getCandlesticks, calculateIndicators, matchIndicators, notify);
 let runner = utils.createConcurrent(3, () => utils.betweenMinMax(3, 6) * 1e2);
 utils.waitFor(
     async function () {
         // Intervals: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
         const iter = [...binance.symbolFilters.keys()];
+        binance.todoList = [];
         if (iter.length === 0) return;
         // const iter = ['BNBUSDT'];
         let start = dayjs();
@@ -26,8 +35,9 @@ utils.waitFor(
                 })
             )
         );
-
-        log.info('calculated %s symbols %s', iter.length, utils.displayDuration(start));
+        binance.todoList.length &&
+            telegram.send(`<b>TODO LIST: </b><code><pre>${JSON.stringify(binance.todoList)}</pre></code>`).catch();
+        log.info('%s todoList: %j', utils.displayDuration(start), binance.todoList);
     },
     () => 10 * 6e4
 );
