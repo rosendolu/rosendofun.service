@@ -38,5 +38,5 @@ utils.waitFor(
     async function () {
         await binance.trigger('spot/24hrTicker', { symbolMap: binance.symbolMap });
     },
-    () => 60 * 6e4
+    () => 30 * 6e4
 );

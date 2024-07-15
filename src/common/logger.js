@@ -18,7 +18,7 @@ const fileFormat = winston.format.combine(
     // })(),
     // winston.format.colorize(),
     // winston.format.label({ label: 'LABEL' }),
-    winston.format.timestamp({ format: utils.timestamp() }),
+    winston.format.timestamp({ format: utils.timestamp }),
     winston.format.printf(options => {
         const { level, message, label, timestamp } = options;
         return `${timestamp} [${level}]: ${message}`;

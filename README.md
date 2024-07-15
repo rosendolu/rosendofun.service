@@ -27,7 +27,7 @@ openssl rsa -pubout -in private_key.pem -out local/public_key.pem
 3. Deploy
 
 ```sh
-npm run prod
+npm run deploy
 ```
 
 ## [HTTP](doc/http.md)

@@ -106,13 +106,14 @@ module.exports = {
     },
 
     async adminAuth(ctx, next) {
-        const token = ctx.session.jwt || '';
         try {
+            const token = ctx.session.jwt || '';
+            assert(token, 'Empty jwt token');
             /**
              * @type {any}
              * */
             const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
-            assert(decoded.role === 'admin', 'Not admin user %s', decoded);
+            assert(decoded.role === 'admin', 'Not admin user');
             ctx.status = 200;
             ctx.body = decoded;
             await next();

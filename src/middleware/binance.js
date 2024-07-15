@@ -80,9 +80,9 @@ module.exports = {
     },
     async matchIndicators(ctx, next) {
         const { kdj, macd, boll, symbol, interval } = ctx;
-        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.j <= 10) {
+        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 20) {
             ctx.action = 'buy';
-        } else if (boll.pb >= 0.5 && macd.histogram >= 0 && kdj.j >= 90) {
+        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 80) {
             ctx.action = 'sell';
         }
         const str = util.format(
@@ -94,7 +94,7 @@ module.exports = {
             ctx.macd,
             ctx.kdj
         );
-        if (kdj.j < 10 || kdj.j > 90 || boll.pb <= 0.1 || boll.pb >= 0.9 || macd.histogram <= 0) {
+        if (kdj.J < 10 || kdj.J > 90 || boll.pb <= 0.1 || boll.pb >= 0.9 || macd.histogram <= 0) {
             log.info(str);
         }
         if (ctx.action) {
