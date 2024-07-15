@@ -19,7 +19,7 @@ const apiProxy = createProxyMiddleware({
     on: {
         proxyReq: (proxyReq, req, res) => {
             // append Basic Auth
-            proxyReq.setHeader('Authorization', req.session.basicAuth);
+            req.session.basicAuth && proxyReq.setHeader('Authorization', req.session.basicAuth);
         },
     },
 });
@@ -33,7 +33,7 @@ module.exports = {
                 // }
                 ctx.respond = false;
                 ctx.req.session = ctx.session;
-                apiProxy(ctx.req, ctx.res, next);
+                apiProxy(ctx.req, ctx.res);
             } else {
                 await next();
             }

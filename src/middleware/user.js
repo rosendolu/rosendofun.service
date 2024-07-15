@@ -7,7 +7,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const dayjs = require('dayjs');
 const env = require('../common/env');
-const { assert } = require('console');
+const assert = require('assert/strict');
 
 module.exports = {
     userHandle() {
@@ -24,7 +24,7 @@ module.exports = {
         };
     },
     userInfo(ctx, next) {
-        const { token, nickname, visitCount, uid, lastVisit, role, auth, secret } = ctx.session;
+        const { token, nickname, visitCount, uid, lastVisit, role, secret, jwt } = ctx.session;
         ctx.body = {
             message: `Last visit ${dayjs().to(dayjs(lastVisit))}!`,
             visitCount: visitCount,
@@ -33,18 +33,19 @@ module.exports = {
             role,
             token: token || '',
             secret,
-            auth,
+            jwt,
         };
     },
-    userLogout(ctx, next) {
+    async userLogout(ctx, next) {
         ctx.session.jwt = '';
         ctx.session.secret = '';
         ctx.session.token = '';
-        ctx.session.role = 'guest';
-        // ctx.set('WWW-Authenticate', 'Basic realm="Logged Out"');
-        // ctx.status = 401;
-        // ctx.body = 'logout';
-        return ctx.redirect(ctx.router.url('userInfo'));
+        ctx.session.role = '';
+        ctx.session.basicAuth = '';
+        await next();
+        ctx.status = 401;
+        // ctx.set('WWW-Authenticate', 'Basic realm="Restricted Access"');
+        ctx.body = ctx.session;
     },
     userLogin(ctx, next) {
         // post body
@@ -89,14 +90,14 @@ module.exports = {
                  * @type {any}
                  * */
                 const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
-                assert(decoded.role === 'admin', 'Not admin user %s', decoded);
+                assert(decoded.role === 'admin', 'Not admin user');
                 pass = true;
             } catch (err) {
                 logger.error('adminRouterAuth %s %j', err, ctx.session);
                 ctx.status = 401;
                 ctx.body = '<h1 style="color:red;text-align:center">401 Unauthorized</h1>';
             }
-            if (true) {
+            if (pass) {
                 await next();
             }
         } else {

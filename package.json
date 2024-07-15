@@ -7,7 +7,8 @@
     "scripts": {
         "dev": "env-cmd -f ./.env.dev.local nodemon src/app.js",
         "start": "env-cmd -f ./.env.local node src/app.js",
-        "prod": "env-cmd -f ./.env.local pm2 start ecosystem.config.js"
+        "deploy": "env-cmd -f ./.env.local pm2 start ecosystem.config.js",
+        "deploy:nohup": "nohup env-cmd -f ./.env.local node src/app.js > /dev/null 2>&1 &"
     },
     "repository": {
         "type": "git",

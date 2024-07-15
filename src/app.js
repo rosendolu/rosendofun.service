@@ -34,9 +34,9 @@ app.use(
 app.use(koaSession(constant.koaSessionConfig, app));
 app.use(user.userHandle());
 app.use(user.adminRouterAuth);
+app.use(useServeTempDir());
 app.use(useKoaBody());
 // app.use(serve(path.join(constant.rootDir, 'temp'), { maxage: 0, hidden: false }));
-app.use(useServeTempDir());
 app.use(router.routes()).use(router.allowedMethods());
 require('./schedule/index');
 require('./service/fileServer');
