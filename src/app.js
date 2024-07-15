@@ -1,9 +1,4 @@
 require('dotenv').config();
-const Koa = require('koa');
-const serve = require('koa-static');
-const { logger } = require('./common/logger');
-const cors = require('@koa/cors');
-const router = require('./router/index');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const duration = require('dayjs/plugin/duration');
@@ -14,6 +9,12 @@ dayjs.extend(relativeTime);
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+const Koa = require('koa');
+const serve = require('koa-static');
+const { logger } = require('./common/logger');
+const cors = require('@koa/cors');
+const router = require('./router/index');
 const { commonHandle, useKoaBody } = require('./middleware');
 const koaSession = require('koa-session');
 const constant = require('./common/constant');
@@ -37,7 +38,7 @@ app.use(useKoaBody());
 // app.use(serve(path.join(constant.rootDir, 'temp'), { maxage: 0, hidden: false }));
 app.use(useServeTempDir());
 app.use(router.routes()).use(router.allowedMethods());
-require('./schedule/index');
+// require('./schedule/index');
 require('./service/fileServer');
 app.listen(env.PORT, () => {
     logger.info(`Server running at http://localhost:%s`, env.PORT);
