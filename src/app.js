@@ -38,7 +38,7 @@ app.use(useKoaBody());
 // app.use(serve(path.join(constant.rootDir, 'temp'), { maxage: 0, hidden: false }));
 app.use(useServeTempDir());
 app.use(router.routes()).use(router.allowedMethods());
-// require('./schedule/index');
+require('./schedule/index');
 require('./service/fileServer');
 app.listen(env.PORT, () => {
     logger.info(`Server running at http://localhost:%s`, env.PORT);
