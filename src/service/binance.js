@@ -38,10 +38,25 @@ class Service extends CreateCompose {
         this.symbolMap = new Map();
         this.symbolFilters = new Map();
         this.rateLimits = [];
+        this.balances = {};
         // this.exchangeFilters = []
         this.init();
     }
     async init() {
+        binance.balance((error, balances) => {
+            if (error) {
+                return log.error(error?.body || error);
+            }
+            //
+            Object.keys(balances).forEach(key => {
+                const obj = balances[key].available;
+                if (parseFloat(obj) > 0) {
+                    this.balances[key] = obj;
+                }
+            });
+
+            log.info('Binance balance %j', this.balances);
+        });
         // const res = await this.api.openOrders(false);
         // log.info('Open orders %j', res);
         this.api.websockets.prevDay(false, (error, res) => {

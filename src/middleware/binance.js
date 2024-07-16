@@ -80,20 +80,8 @@ module.exports = {
     async matchIndicators(ctx, next) {
         const { kdj, macd, boll, symbol, interval } = ctx;
         if (!kdj || !macd || !boll) return;
-        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 10) {
-            ctx.action = 'BUY';
-        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 90) {
-            ctx.action = 'SELL';
-        }
-        const str = util.format(
-            '%s %s [%s] indicator: BOLL: %j ,MACD: %j , KDJ: %j',
-            symbol,
-            interval,
-            ctx.action || '',
-            ctx.boll,
-            ctx.macd,
-            ctx.kdj
-        );
+
+        const str = util.format('%s %s : BOLL: %j ,MACD: %j , KDJ: %j', symbol, interval, ctx.boll, ctx.macd, ctx.kdj);
 
         if (kdj.J <= 0 || boll.pb <= 0) {
             log.info('OVER_SOLD ' + str);
@@ -102,14 +90,18 @@ module.exports = {
             log.info('OVER_BOUGHT ' + str);
             // /usdt$/i.test(symbol) && binance.todoList.push({ type: 'OVER_BOUGHT', symbol, interval, boll, macd, kdj });
         }
-
+        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 10) {
+            ctx.action = 'BUY';
+        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 90) {
+            ctx.action = 'SELL';
+        }
         await next();
     },
     notify(ctx, next) {
         const { symbol, interval } = ctx;
         if (ctx.action && /usdt$/i.test(symbol)) {
             binance.todoList.push([ctx.action, symbol]);
-
+            log.warn('[%s] %s', ctx.action, symbol);
             const html = `<b>${symbol} ${interval} ${ctx.action}: </b>\n<pre>BOLL: ${JSON.stringify(
                 ctx.boll
             )}</pre>\n<pre>MACD: ${JSON.stringify(ctx.macd)}</pre>\n<pre>KDJ: ${JSON.stringify(ctx.kdj)}</pre>\n`;
