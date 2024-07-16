@@ -3,15 +3,25 @@ const CreateCompose = require('../common/useCompose');
 const { getLogger } = require('../common/logger');
 const { isProdEnv } = require('../common/constant');
 const log = getLogger('binance');
-const binance = new Binance().options({
-    useServerTime: true,
-    reconnect: true,
-    verbose: isProdEnv ? false : true,
-    family: 4,
-    log: (...params) => log.debug(params),
-    APIKEY: process.env.BINANCE_APIKEY,
-    APISECRET: process.env.BINANCE_APISECRET,
-});
+const binance = new Binance().options(
+    {
+        urls: {
+            base: 'https://api.binance.us/api/',
+            stream: 'wss://stream.binance.us:9443/ws/',
+            combineStream: 'wss://stream.binance.us:9443/stream?streams=',
+        },
+        useServerTime: true,
+        reconnect: true,
+        verbose: isProdEnv ? false : true,
+        family: 4,
+        log: (...params) => log.debug(params),
+        APIKEY: process.env.BINANCE_APIKEY,
+        APISECRET: process.env.BINANCE_APISECRET,
+    },
+    () => {
+        log.info('Binance Service: %O', binance.getInfo());
+    }
+);
 
 process.on('beforeExit', () => {
     // List all endpoints
@@ -63,7 +73,7 @@ class Service extends CreateCompose {
         // });
         this.api.exchangeInfo((error, data) => {
             if (error) {
-                return log.error('exchangeInfo %s', error.toString());
+                return log.error('exchangeInfo %s', error.body || error);
             }
             // {rateLimitType: 'REQUEST_WEIGHT', interval: 'MINUTE', intervalNum: 1, limit: 6000}
             this.rateLimits = data.rateLimits;
