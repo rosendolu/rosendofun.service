@@ -1,9 +1,9 @@
 const dayjs = require('dayjs');
 const utils = require('../common/utils');
 
-module.exports = router => {
-    router.all('/', ctx => {
-        ctx.status = 302;
-        ctx.redirect(router.url('userInfo'));
-    });
-};
+const Router = require('@koa/router');
+const router = new Router();
+router.all('/', ctx => {
+    ctx.body = `<h1 style="text-align:center">Hello from <em><i>rosendofun.service</i></em></h1>`;
+});
+module.exports = router;

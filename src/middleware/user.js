@@ -82,25 +82,22 @@ module.exports = {
     },
 
     async adminRouterAuth(ctx, next) {
-        if (ctx.path.startsWith('/admin')) {
-            let pass = false;
-            try {
-                const token = ctx.session.jwt || '';
-                /**
-                 * @type {any}
-                 * */
-                const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
-                assert(decoded.role === 'admin', 'Not admin user');
-                pass = true;
-            } catch (err) {
-                logger.error('adminRouterAuth %s %j', err, ctx.session);
-                ctx.status = 401;
-                ctx.body = '<h1 style="color:red;text-align:center">401 Unauthorized</h1>';
-            }
-            if (pass) {
-                await next();
-            }
-        } else {
+        let pass = false;
+        try {
+            const token = ctx.session.jwt || '';
+            assert(token, 'token must provided');
+            /**
+             * @type {any}
+             * */
+            const decoded = jwt.verify(token, env.PUBLIC_KEY, { issuer: env.SERVICE_NAME });
+            assert(decoded.role === 'admin', 'Not admin user');
+            pass = true;
+        } catch (err) {
+            logger.error('adminRouterAuth %s %j', err, ctx.session);
+            ctx.status = 401;
+            ctx.body = '<h1 style="color:red;text-align:center">401 Unauthorized</h1>';
+        }
+        if (pass) {
             await next();
         }
     },

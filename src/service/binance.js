@@ -19,7 +19,7 @@ const binance = new Binance().options(
         APISECRET: process.env.BINANCE_APISECRET,
     },
     () => {
-        log.info('Binance Service: %O', binance.getInfo());
+        log.info('Binance Service: %j', binance.getInfo());
     }
 );
 

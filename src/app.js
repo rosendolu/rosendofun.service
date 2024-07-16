@@ -14,14 +14,13 @@ const Koa = require('koa');
 const serve = require('koa-static');
 const { logger } = require('./common/logger');
 const cors = require('@koa/cors');
-const router = require('./router/index');
 const { commonHandle, useKoaBody } = require('./middleware');
 const koaSession = require('koa-session');
 const constant = require('./common/constant');
 const user = require('./middleware/user');
 const path = require('node:path');
 const env = require('./common/env');
-const { useServeTempDir } = require('./middleware/file');
+const { useRouter } = require('./router');
 const app = new Koa();
 app.keys = [env.SECRET_KEYS];
 
@@ -33,11 +32,8 @@ app.use(
 );
 app.use(koaSession(constant.koaSessionConfig, app));
 app.use(user.userHandle());
-app.use(user.adminRouterAuth);
-app.use(useServeTempDir());
 app.use(useKoaBody());
-// app.use(serve(path.join(constant.rootDir, 'temp'), { maxage: 0, hidden: false }));
-app.use(router.routes()).use(router.allowedMethods());
+useRouter(app);
 require('./schedule/index');
 require('./service/fileServer');
 app.listen(env.PORT, () => {

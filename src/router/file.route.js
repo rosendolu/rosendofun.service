@@ -1,6 +1,9 @@
 const fileMiddleware = require('../middleware/file');
 
-const prefix = '/file';
-module.exports = router => {
-    router.post(`${prefix}/upload`, fileMiddleware.uploadFile).get(`${prefix}/list`, fileMiddleware.listFile);
-};
+const Router = require('@koa/router');
+const router = new Router({
+    prefix: '/file',
+});
+
+router.post('/upload', fileMiddleware.uploadFile).get('/list', fileMiddleware.listFile);
+module.exports = router;

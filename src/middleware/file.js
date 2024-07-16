@@ -11,7 +11,7 @@ const handler = require('serve-handler');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const apiProxy = createProxyMiddleware({
-    target: 'http://127.0.0.1:3001',
+    target: 'http://127.0.0.1:3001/',
     changeOrigin: true, // for vhosted sites
     pathRewrite: {
         '^/admin/temp/': '/',
@@ -25,19 +25,13 @@ const apiProxy = createProxyMiddleware({
 });
 
 module.exports = {
-    useServeTempDir() {
-        return async (ctx, next) => {
-            if (ctx.path.startsWith('/admin/temp')) {
-                // if (ctx.path !== '/' && !ctx.path.endsWith('/')) {
-                //     ctx.path += '/';
-                // }
-                ctx.respond = false;
-                ctx.req.session = ctx.session;
-                apiProxy(ctx.req, ctx.res);
-            } else {
-                await next();
-            }
-        };
+    serveTempDir(ctx, next) {
+        // if (ctx.path !== '/' && !ctx.path.endsWith('/')) {
+        //     ctx.path += '/';
+        // }
+        ctx.respond = false;
+        ctx.req.session = ctx.session;
+        apiProxy(ctx.req, ctx.res);
     },
     async uploadFile(ctx, next) {
         const { uid, nickname } = ctx.session;
