@@ -21,11 +21,10 @@ utils.waitFor(
     async function () {
         // Intervals: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
         const iter = [...binance.symbolFilters.keys()];
-        binance.todoList = [];
         if (iter.length === 0) return;
         // const iter = ['BNBUSDT'];
         let start = dayjs();
-        log.info('start calculate %s', iter.length);
+        log.info('start %s', iter.length);
 
         await Promise.allSettled(
             iter.map(symbol =>
@@ -35,11 +34,11 @@ utils.waitFor(
                 })
             )
         );
-        binance.todoList.length &&
-            telegram.send(`<b>TODO LIST: </b><code><pre>${JSON.stringify(binance.todoList)}</pre></code>`).catch();
-        log.info('%s todoList: %j', utils.displayDuration(start), binance.todoList);
-    },
-    () => 10 * 6e4
+
+        // telegram.send(`<b>TODO LIST: </b><code><pre>${JSON.stringify(binance.todoMap)}</pre></code>`).catch();
+        log.info('consume %s \n', utils.displayDuration(start));
+    }
+    // () => 10 * 6e4
 );
 
 // spot/24hrTicker

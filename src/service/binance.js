@@ -33,7 +33,8 @@ process.on('beforeExit', () => {
 class Service extends CreateCompose {
     constructor() {
         super();
-        this.todoList = [];
+        this.todoMap = {};
+        this.fluctuation = {};
         this.api = binance;
         this.symbolMap = new Map();
         this.symbolFilters = new Map();
