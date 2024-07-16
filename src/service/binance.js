@@ -5,11 +5,11 @@ const { isProdEnv } = require('../common/constant');
 const log = getLogger('binance');
 const binance = new Binance().options(
     {
-        urls: {
-            base: 'https://api.binance.us/api/',
-            stream: 'wss://stream.binance.us:9443/ws/',
-            combineStream: 'wss://stream.binance.us:9443/stream?streams=',
-        },
+        // urls: {
+        //     base: 'https://api.binance.us/api/',
+        //     stream: 'wss://stream.binance.us:9443/ws/',
+        //     combineStream: 'wss://stream.binance.us:9443/stream?streams=',
+        // },
         useServerTime: true,
         reconnect: true,
         verbose: isProdEnv ? false : true,
@@ -43,20 +43,20 @@ class Service extends CreateCompose {
         this.init();
     }
     async init() {
-        binance.balance((error, balances) => {
-            if (error) {
-                return log.error(error?.body || error);
-            }
-            //
-            Object.keys(balances).forEach(key => {
-                const obj = balances[key].available;
-                if (parseFloat(obj) > 0) {
-                    this.balances[key] = obj;
-                }
-            });
+        // binance.balance((error, balances) => {
+        //     if (error) {
+        //         return log.error(error?.body || error);
+        //     }
+        //     //
+        //     Object.keys(balances).forEach(key => {
+        //         const obj = balances[key].available;
+        //         if (parseFloat(obj) > 0) {
+        //             this.balances[key] = obj;
+        //         }
+        //     });
 
-            log.info('Binance balance %j', this.balances);
-        });
+        //     log.info('Binance balance %j', this.balances);
+        // });
         // const res = await this.api.openOrders(false);
         // log.info('Open orders %j', res);
         this.api.websockets.prevDay(false, (error, res) => {

@@ -21,7 +21,7 @@ SECRET_KEYS=xxxxxx
 ```sh
 mkdir local
 openssl genpkey -algorithm RSA -out local/private_key.pem
-openssl rsa -pubout -in private_key.pem -out local/public_key.pem
+openssl rsa -pubout -in local/private_key.pem -out local/public_key.pem
 ```
 
 3. Deploy
