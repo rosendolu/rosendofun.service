@@ -5,10 +5,11 @@
     "description": "rosendofun.service",
     "main": "src/app.js",
     "scripts": {
-        "dev": "env-cmd -f ./.env.dev.local nodemon src/app.js",
+        "dev": "env-cmd -f ./.env.dev.local node --watch src/app.js",
         "start": "env-cmd -f ./.env.local node src/app.js",
         "deploy": "env-cmd -f ./.env.local pm2 start ecosystem.config.js",
-        "deploy:nohup": "nohup env-cmd -f ./.env.local node src/app.js > /dev/null 2>&1 &"
+        "deploy:nohup": "nohup env-cmd -f ./.env.local node src/app.js > /dev/null 2>&1 &",
+        "test": "env-cmd -f .env.dev.local node --watch src/test/binance-spot-balance.js"
     },
     "repository": {
         "type": "git",

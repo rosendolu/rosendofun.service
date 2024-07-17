@@ -1,5 +1,14 @@
-const crypto = require('crypto');
 const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+const duration = require('dayjs/plugin/duration');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+// Extend dayjs with the relativeTime plugin
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidV4 } = require('uuid');

@@ -1,4 +1,4 @@
-const utils = require('../src/common/utils');
+const utils = require('../common/utils');
 
 function log(...args) {
     console.log(`[${new Date().toLocaleTimeString()}]:`, ...args);

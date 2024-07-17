@@ -6,6 +6,7 @@ const telegram = require('../service/telegram');
 const mail = require('../service/mail');
 const log = getLogger('binance');
 const util = require('node:util');
+const { calculateKDJ } = require('../common/finance');
 
 const concurrentSend = utils.createConcurrent(2, 1e3);
 
@@ -58,23 +59,26 @@ module.exports = {
         });
         ctx.macd = ctx.MACD[ctx.MACD.length - 1];
         // { MACD: -20.590545983117522,signal: -22.632049483954525,histogram: 2.0415035008370026,}
-        const stoch = Stochastic.calculate({
-            high: highs,
-            low: lows,
-            close: closes,
-            period: 9,
-            signalPeriod: 3,
-        });
+        // const stoch = Stochastic.calculate({
+        //     high: highs,
+        //     low: lows,
+        //     close: closes,
+        //     period: 9,
+        //     signalPeriod: 3,
+        // });
 
-        const K = stoch.map(item => item.k);
-        const D = stoch.map(item => item.d);
-        const J = K.map((k, i) => 3 * k - 2 * D[i]);
+        // const K = stoch.map(item => item.k);
+        // const D = stoch.map(item => item.d);
+        // const J = K.map((k, i) => 3 * k - 2 * D[i]);
 
-        ctx.KDJ = { K, D, J };
-        ctx.kdj = { K: K[K.length - 1], D: D[D.length - 1], J: J[J.length - 1] };
+        // ctx.KDJ = { K, D, J };
+        const KDJ = calculateKDJ(highs, lows, closes, 9);
+        ctx.KDJ = KDJ;
+        ctx.kdj = { K: KDJ['K'].at(-1), D: KDJ['D'].at(-1), J: KDJ['J'].at(-1) };
+        // ctx.kdj = { K: K[K.length - 1], D: D[D.length - 1], J: J[J.length - 1] };
         // { K: 88.59357696566991,D: 73.51245717446496,J: 118.75581654807982,}
 
-        // log.debug('%s %s indicator: BOLL: %j ,MACD: %j , KDJ: %j', symbol, interval, ctx.boll, ctx.macd, ctx.kdj);
+        log.debug('%s %s indicator: BOLL: %j ,MACD: %j , KDJ: %j', symbol, interval, ctx.boll, ctx.macd, ctx.kdj);
         await next();
     },
     async matchIndicators(ctx, next) {
@@ -84,16 +88,18 @@ module.exports = {
         const str = util.format('%s %s : BOLL: %j ,MACD: %j , KDJ: %j', symbol, interval, ctx.boll, ctx.macd, ctx.kdj);
 
         if (kdj.J <= 0 || boll.pb <= 0) {
-            if (!binance.fluctuation[symbol]) {
-                log.info('OVER_SOLD ' + str);
+            const type = 'OVER_SOLD';
+            if (!binance.fluctuation[symbol] || binance.fluctuation[symbol].type !== type) {
+                log.info(type + ' ' + str);
             }
-            binance.fluctuation[symbol] = { symbol, interval, type: 'OVER_SOLD', boll, macd, kdj };
+            binance.fluctuation[symbol] = { symbol, interval, type, boll, macd, kdj };
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_SOLD', symbol, interval, boll, macd, kdj });
         } else if (kdj.J >= 100 || boll.pb >= 1) {
-            if (!binance.fluctuation[symbol]) {
-                log.info('OVER_BOUGHT ' + str);
+            const type = 'OVER_BOUGHT';
+            if (!binance.fluctuation[symbol] || binance.fluctuation[symbol].type !== type) {
+                log.info(type + ' ' + str);
             }
-            binance.fluctuation[symbol] = { symbol, interval, type: 'OVER_BOUGHT', boll, macd, kdj };
+            binance.fluctuation[symbol] = { symbol, interval, type, boll, macd, kdj };
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_BOUGHT', symbol, interval, boll, macd, kdj });
         }
         if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 10) {
@@ -104,26 +110,26 @@ module.exports = {
 
         await next();
     },
-    notify(ctx, next) {
+    async notify(ctx, next) {
         const { symbol, interval, action, boll, kdj, macd } = ctx;
 
         if (ctx.action && /usdt$/i.test(symbol)) {
-            if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
-                log.warn('[%s] %s', ctx.action, symbol);
+            // if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
+            log.warn('%s [%s]', symbol, ctx.action);
 
-                concurrentSend(async () => {
-                    const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
-                        boll
-                    )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
-                    await Promise.allSettled([
-                        telegram.send(html),
-                        mail.send({
-                            subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
-                            html: html, // html body
-                        }),
-                    ]);
-                }).catch();
-            }
+            concurrentSend(async () => {
+                const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
+                    boll
+                )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
+                await Promise.allSettled([
+                    telegram.send(html),
+                    mail.send({
+                        subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
+                        html: html, // html body
+                    }),
+                ]);
+            }).catch();
+            // }
             binance.todoMap[symbol] = { symbol, interval, action, boll, macd, kdj };
         }
     },
