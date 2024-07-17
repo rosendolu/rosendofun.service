@@ -37,8 +37,8 @@ utils.waitFor(
 
         // telegram.send(`<b>TODO LIST: </b><code><pre>${JSON.stringify(binance.todoMap)}</pre></code>`).catch();
         log.info('consume %s \n', utils.displayDuration(start));
-    }
-    // () => 10 * 6e4
+    },
+    () => 1 * 6e4
 );
 
 // spot/24hrTicker
