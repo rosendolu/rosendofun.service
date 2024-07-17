@@ -9,6 +9,14 @@ const util = require('node:util');
 const { calculateKDJ } = require('../common/finance');
 
 const concurrentSend = utils.createConcurrent(2, 1e3);
+let sendMap = {};
+const throttledSend = async (key, cb) => {
+    if (sendMap[key]) return;
+    sendMap[key] = 1;
+    await Promise.resolve(cb());
+    await utils.delay(5 * 6e4);
+    sendMap[key] = 0;
+};
 
 module.exports = {
     async getCandlesticks(ctx, next) {
@@ -117,7 +125,7 @@ module.exports = {
             // if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
             log.warn('%s [%s]', symbol, ctx.action);
 
-            concurrentSend(async () => {
+            throttledSend(`${symbol}-${action}`, async () => {
                 const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
                     boll
                 )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
