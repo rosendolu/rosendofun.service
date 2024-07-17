@@ -8,13 +8,13 @@ const log = getLogger('binance');
 const util = require('node:util');
 const { calculateKDJ } = require('../common/finance');
 
-const concurrentSend = utils.createConcurrent(2, 1e3);
+const concurrentSend = utils.createConcurrent(2, () => utils.betweenMinMax(500, 2000));
 let sendMap = {};
 const throttledSend = async (key, cb) => {
     if (sendMap[key]) return;
     sendMap[key] = 1;
-    await Promise.resolve(cb());
-    await utils.delay(5 * 6e4);
+    await concurrentSend(cb);
+    await utils.delay(60 * 6e4);
     sendMap[key] = 0;
 };
 
@@ -110,9 +110,9 @@ module.exports = {
             binance.fluctuation[symbol] = { symbol, interval, type, boll, macd, kdj };
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_BOUGHT', symbol, interval, boll, macd, kdj });
         }
-        if (boll.pb <= 0.1 && macd.histogram <= 0 && kdj.J <= 10) {
+        if (boll.pb <= 0 && macd.histogram <= 0 && kdj.J <= 10) {
             ctx.action = 'BUY';
-        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 90) {
+        } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 100) {
             ctx.action = 'SELL';
         }
 
@@ -121,9 +121,9 @@ module.exports = {
     async notify(ctx, next) {
         const { symbol, interval, action, boll, kdj, macd } = ctx;
 
-        if (ctx.action && /usdt$/i.test(symbol)) {
+        if (ctx.action) {
             // if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
-            log.warn('%s [%s]', symbol, ctx.action);
+            log.warn('%s [%s] boll:%j macd:%j kdj:%j', symbol, ctx.action, boll.pb, macd, kdj);
 
             throttledSend(`${symbol}-${action}`, async () => {
                 const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
@@ -156,8 +156,8 @@ module.exports = {
     },
     getServiceState(ctx, next) {
         ctx.body = {
-            todoMap: binance.todoMap,
-            fluctuation: binance.fluctuation,
+            todo: Object.values(binance.todoMap).sort((a, b) => b.kdj.J - a.kdj.J),
+            fluctuation: Object.values(binance.fluctuation).sort((a, b) => b.kdj.J - a.kdj.J),
         };
     },
 };

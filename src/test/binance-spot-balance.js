@@ -14,9 +14,9 @@ async function main() {
             }
             let result = {};
             Object.keys(balances).forEach(key => {
-                const obj = balances[key].available;
-                if (parseFloat(obj) > 0) {
-                    result[key] = obj;
+                const num = parseFloat(balances[key].available) + parseFloat(balances[key].onOrder);
+                if (num > 0) {
+                    result[key] = num;
                 }
             });
 
@@ -25,7 +25,7 @@ async function main() {
                 for (const symbol of Object.keys(result)) {
                     log.info('%s %j', symbol, result[symbol]);
                     await binance.trigger('spot/candlesticks', { symbol: symbol + 'USDT', interval: '1d' });
-                    await delay(3e3);
+                    await delay(300);
                 }
                 return 1;
             }, 3e3);

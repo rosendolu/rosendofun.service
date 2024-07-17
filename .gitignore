@@ -6,3 +6,5 @@ logs/*
 *.local
 temp/
 debug/
+1.json
+2.json
