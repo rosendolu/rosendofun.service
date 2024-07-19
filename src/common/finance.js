@@ -23,4 +23,34 @@ function calculateKDJ(highs, lows, closes, period = 9) {
 
     return { K: kValues, D: dValues, J: jValues };
 }
-module.exports = { calculateKDJ };
+
+// Helper functions
+function sma(values, period) {
+    return values.slice(period).map((_, i) => values.slice(i, i + period).reduce((acc, val) => acc + val, 0) / period);
+}
+
+function calculateRSI(prices, period = 14) {
+    let gains = [];
+    let losses = [];
+
+    for (let i = 1; i < prices.length; i++) {
+        let change = prices[i] - prices[i - 1];
+        if (change > 0) {
+            gains.push(change);
+            losses.push(0);
+        } else {
+            gains.push(0);
+            losses.push(-change);
+        }
+    }
+
+    let avgGain = sma(gains, period).slice(-1)[0];
+    let avgLoss = sma(losses, period).slice(-1)[0];
+
+    let rs = avgGain / avgLoss;
+    let rsi = 100 - 100 / (1 + rs);
+
+    return rsi;
+}
+
+module.exports = { calculateKDJ, sma, calculateRSI };

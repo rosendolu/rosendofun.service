@@ -99,15 +99,15 @@ module.exports = {
             const type = 'OVER_SOLD';
             if (!binance.fluctuation[symbol] || binance.fluctuation[symbol].type !== type) {
                 log.info(type + ' ' + str);
+                binance.fluctuation[symbol] = { timestamp: utils.timestamp(), symbol, interval, type, boll, macd, kdj };
             }
-            binance.fluctuation[symbol] = { symbol, interval, type, boll, macd, kdj };
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_SOLD', symbol, interval, boll, macd, kdj });
         } else if (kdj.J >= 100 || boll.pb >= 1) {
             const type = 'OVER_BOUGHT';
             if (!binance.fluctuation[symbol] || binance.fluctuation[symbol].type !== type) {
                 log.info(type + ' ' + str);
+                binance.fluctuation[symbol] = { timestamp: utils.timestamp(), symbol, interval, type, boll, macd, kdj };
             }
-            binance.fluctuation[symbol] = { symbol, interval, type, boll, macd, kdj };
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_BOUGHT', symbol, interval, boll, macd, kdj });
         }
         if (boll.pb <= 0 && macd.histogram <= 0 && kdj.J <= 10) {
@@ -122,23 +122,23 @@ module.exports = {
         const { symbol, interval, action, boll, kdj, macd } = ctx;
 
         if (ctx.action) {
-            // if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
-            log.warn('%s [%s] boll:%j macd:%j kdj:%j', symbol, ctx.action, boll.pb, macd, kdj);
+            if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
+                log.warn('%s [%s] boll:%j macd:%j kdj:%j', symbol, ctx.action, boll.pb, macd, kdj);
 
-            throttledSend(`${symbol}-${action}`, async () => {
-                const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
-                    boll
-                )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
-                await Promise.allSettled([
-                    telegram.send(html),
-                    mail.send({
-                        subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
-                        html: html, // html body
-                    }),
-                ]);
-            }).catch();
-            // }
-            binance.todoMap[symbol] = { symbol, interval, action, boll, macd, kdj };
+                throttledSend(`${symbol}-${action}`, async () => {
+                    const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
+                        boll
+                    )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
+                    await Promise.allSettled([
+                        telegram.send(html),
+                        mail.send({
+                            subject: `Binance: ${symbol} ${interval} ${ctx.action}`, // Subject line
+                            html: html, // html body
+                        }),
+                    ]);
+                }).catch();
+                binance.todoMap[symbol] = { timestamp: utils.timestamp(), symbol, interval, action, boll, macd, kdj };
+            }
         }
     },
     detectPriceChange(ctx, next) {
