@@ -13,5 +13,5 @@ try {
         require(path.resolve(__dirname, jobPath));
     }
 } catch (err) {
-    logger.error('schedule/index.js %s', err.toString());
+    logger.error('schedule/index.js %s', err?.toString());
 }

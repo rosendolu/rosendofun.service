@@ -111,9 +111,9 @@ module.exports = {
             // /usdt$/i.test(symbol) && binance.todoMap.push({ type: 'OVER_BOUGHT', symbol, interval, boll, macd, kdj });
         }
         if (boll.pb <= 0 && macd.histogram <= 0 && kdj.J <= 10) {
-            ctx.action = 'BUY';
+            ctx.action = 'LONG';
         } else if (boll.pb >= 0.9 && macd.histogram >= 0 && kdj.J >= 100) {
-            ctx.action = 'SELL';
+            ctx.action = 'SHORT';
         }
 
         await next();
@@ -126,9 +126,11 @@ module.exports = {
                 log.warn('%s [%s] boll:%j macd:%j kdj:%j', symbol, ctx.action, boll.pb, macd, kdj);
 
                 throttledSend(`${symbol}-${action}`, async () => {
-                    const html = `<b>${symbol} ${interval} ${action}: </b>\n<pre>BOLL: ${JSON.stringify(
-                        boll
-                    )}</pre>\n<pre>MACD: ${JSON.stringify(macd)}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
+                    const html = `<b>${symbol} ${interval} ${action} ${
+                        action === 'LONG' ? '🟢' : '🔴'
+                    }: </b>\n<pre>BOLL: ${JSON.stringify(boll)}</pre>\n<pre>MACD: ${JSON.stringify(
+                        macd
+                    )}</pre>\n<pre>KDJ: ${JSON.stringify(kdj)}</pre>\n`;
                     await Promise.allSettled([
                         telegram.send(html),
                         mail.send({

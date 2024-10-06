@@ -15,12 +15,13 @@ class Service extends CreateCompose {
         this.bot = bot;
         this.init();
         bot.on('message', msg => {
+            // console.log(msg);
             // {"message_id":2,"from":{"id":2020807895,"is_bot":false,"first_name":"Rosendo","username":"rosendoX","language_code":"en"},"chat":{"id":-1002231802147,"title":"Binance Test","type":"supergroup"},"date":1720944214,"text":"xxx","has_protected_content":true}
             this.trigger('tg/message', msg);
         });
     }
     init() {
-        this.send(`startedAt:${utils.timestamp()}`);
+        this.send(`ReStartedAt:${utils.timestamp()}`);
     }
     send(str) {
         // ,`<b>title:${(this.globalMap.minDiff * 100).toFixed(2)}%</b>`

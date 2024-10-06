@@ -18,5 +18,8 @@
     "emmet.includeLanguages": {
         "javascript": "off",
         "typescript": "off"
+    },
+    "[dotenv]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
     }
 }
