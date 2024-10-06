@@ -7,6 +7,7 @@ const mail = require('../service/mail');
 const log = getLogger('binance');
 const util = require('node:util');
 const { calculateKDJ } = require('../common/finance');
+const dayjs = require('dayjs');
 
 const concurrentSend = utils.createConcurrent(2, () => utils.betweenMinMax(500, 2000));
 let sendMap = {};
@@ -122,6 +123,10 @@ module.exports = {
         const { symbol, interval, action, boll, kdj, macd } = ctx;
 
         if (ctx.action) {
+            // expire in one day
+            if (binance.todoMap[symbol]?.timestamp && dayjs().diff(binance.todoMap[symbol].timestamp, 'day') >= 1) {
+                binance.todoMap[symbol] = null;
+            }
             if (!binance.todoMap[symbol] || binance.todoMap[symbol]?.action !== action) {
                 log.warn('%s [%s] boll:%j macd:%j kdj:%j', symbol, ctx.action, boll.pb, macd, kdj);
 
